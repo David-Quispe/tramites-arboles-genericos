@@ -5,6 +5,7 @@
 {% block topbar_acciones %}
     <a href="{% url 'alumnos_lista' %}" class="btn btn-sm">← Volver</a>
     <a href="{% url 'alumno_editar' alumno.dni %}" class="btn btn-primary">Editar</a>
+    <a href="{% url 'alumno_eliminar' alumno.dni %}" class="btn btn-sm btn-danger">Eliminar</a>
 {% endblock %}
 
 {% block content %}
@@ -48,7 +49,10 @@
                     <td>S/ {{ p.monto }}</td>
                     <td><span class="badge-estado estado-{{ p.estado }}">{{ p.get_estado_display }}</span></td>
                     <td>{{ p.fecha_pago|default:"—" }}</td>
-                    <td><a href="{% url 'pension_editar' p.pk %}" class="btn btn-sm">Editar</a></td>
+                    <td>
+                        <a href="{% url 'pension_editar' p.pk %}" class="btn btn-sm">Editar</a>
+                        <a href="{% url 'pension_eliminar' p.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr><td colspan="6" class="text-center">Sin pensiones registradas.</td></tr>
@@ -75,7 +79,10 @@
                     <td><span class="badge-estado estado-{{ b.estado }}">{{ b.get_estado_display }}</span></td>
                     <td>{{ b.fecha_inicio }}</td>
                     <td>{{ b.fecha_fin|default:"Vigente" }}</td>
-                    <td><a href="{% url 'beca_editar' b.pk %}" class="btn btn-sm">Editar</a></td>
+                    <td>
+                        <a href="{% url 'beca_editar' b.pk %}" class="btn btn-sm">Editar</a>
+                        <a href="{% url 'beca_eliminar' b.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr><td colspan="6" class="text-center">Sin becas registradas.</td></tr>
@@ -101,7 +108,10 @@
                     <td><span class="badge-estado estado-{{ d.estado }}">{{ d.get_estado_display }}</span></td>
                     <td>{{ d.fecha_solicitud }}</td>
                     <td>{{ d.fecha_entrega|default:"—" }}</td>
-                    <td><a href="{% url 'documento_editar' d.pk %}" class="btn btn-sm">Editar</a></td>
+                    <td>
+                        <a href="{% url 'documento_editar' d.pk %}" class="btn btn-sm">Editar</a>
+                        <a href="{% url 'documento_eliminar' d.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr><td colspan="6" class="text-center">Sin documentos registrados.</td></tr>

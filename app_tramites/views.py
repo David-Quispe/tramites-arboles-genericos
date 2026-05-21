@@ -2,8 +2,10 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.contrib import messages
 from django.db.models import Count, Q
+from django.core.paginator import Paginator
 from .models import NodoTramite, Alumno, Carrera, Pension, Beca, Documento
 from .tree_logic.generic_tree import NodoArbol, ArbolGenerico
+from .forms import AlumnoForm, CarreraForm, PensionForm, BecaForm, DocumentoForm
 
 # ============================================================
 # ROL: BACKEND — Vistas y Endpoints
@@ -62,8 +64,11 @@ def alumnos_lista(request):
         alumnos = alumnos.filter(anio=anio)
     if ciclo in ['1', '2', '3', '4', '5', '6']:
         alumnos = alumnos.filter(ciclo=ciclo)
+    paginator = Paginator(alumnos, 25)
+    page = request.GET.get('page', 1)
+    alumnos_page = paginator.get_page(page)
     return render(request, 'tramites/alumnos_lista.html', {
-        'alumnos': alumnos,
+        'alumnos': alumnos_page,
         'q': q,
         'carreras': carreras,
         'carrera_cod': carrera_cod,
@@ -84,41 +89,27 @@ def alumno_detalle(request, dni):
     })
 
 def alumno_nuevo(request):
-    carreras = Carrera.objects.all()
     if request.method == 'POST':
-        try:
-            alumno = Alumno.objects.create(
-                dni           = request.POST['dni'],
-                nombre        = request.POST['nombre'],
-                apellido      = request.POST['apellido'],
-                carrera_id    = request.POST['carrera'],
-                anio          = request.POST['anio'],
-                ciclo         = request.POST['ciclo'],
-                fecha_ingreso = request.POST['fecha_ingreso'],
-            )
+        form = AlumnoForm(request.POST)
+        if form.is_valid():
+            alumno = form.save()
             messages.success(request, f'Alumno {alumno.nombre_completo} registrado correctamente.')
             return redirect('alumno_detalle', dni=alumno.dni)
-        except Exception as e:
-            messages.error(request, f'Error: {e}')
-    return render(request, 'tramites/alumno_form.html', {'carreras': carreras, 'accion': 'Nuevo'})
+    else:
+        form = AlumnoForm()
+    return render(request, 'tramites/alumno_form.html', {'form': form, 'accion': 'Nuevo'})
 
 def alumno_editar(request, dni):
-    alumno   = get_object_or_404(Alumno, dni=dni)
-    carreras = Carrera.objects.all()
+    alumno = get_object_or_404(Alumno, dni=dni)
     if request.method == 'POST':
-        try:
-            alumno.nombre        = request.POST['nombre']
-            alumno.apellido      = request.POST['apellido']
-            alumno.carrera_id    = request.POST['carrera']
-            alumno.anio          = request.POST['anio']
-            alumno.ciclo         = request.POST['ciclo']
-            alumno.fecha_ingreso = request.POST['fecha_ingreso']
-            alumno.save()
+        form = AlumnoForm(request.POST, instance=alumno)
+        if form.is_valid():
+            form.save()
             messages.success(request, 'Datos actualizados correctamente.')
             return redirect('alumno_detalle', dni=alumno.dni)
-        except Exception as e:
-            messages.error(request, f'Error: {e}')
-    return render(request, 'tramites/alumno_form.html', {'alumno': alumno, 'carreras': carreras, 'accion': 'Editar'})
+    else:
+        form = AlumnoForm(instance=alumno)
+    return render(request, 'tramites/alumno_form.html', {'form': form, 'alumno': alumno, 'accion': 'Editar'})
 
 
 # ------------------------------------------------------------
@@ -128,38 +119,27 @@ def alumno_editar(request, dni):
 def pension_nueva(request, dni):
     alumno = get_object_or_404(Alumno, dni=dni)
     if request.method == 'POST':
-        try:
-            Pension.objects.create(
-                alumno      = alumno,
-                mes         = request.POST['mes'],
-                anio        = request.POST['anio'],
-                monto       = request.POST['monto'],
-                estado      = request.POST['estado'],
-                fecha_pago  = request.POST.get('fecha_pago') or None,
-                observacion = request.POST.get('observacion', ''),
-            )
+        form = PensionForm(request.POST)
+        if form.is_valid():
+            form.instance.alumno = alumno
+            form.save()
             messages.success(request, 'Pensión registrada.')
             return redirect('alumno_detalle', dni=dni)
-        except Exception as e:
-            messages.error(request, f'Error: {e}')
-    return render(request, 'tramites/pension_form.html', {'alumno': alumno})
+    else:
+        form = PensionForm()
+    return render(request, 'tramites/pension_form.html', {'form': form, 'alumno': alumno})
 
 def pension_editar(request, pk):
     pension = get_object_or_404(Pension, pk=pk)
     if request.method == 'POST':
-        try:
-            pension.mes         = request.POST['mes']
-            pension.anio        = request.POST['anio']
-            pension.monto       = request.POST['monto']
-            pension.estado      = request.POST['estado']
-            pension.fecha_pago  = request.POST.get('fecha_pago') or None
-            pension.observacion = request.POST.get('observacion', '')
-            pension.save()
+        form = PensionForm(request.POST, instance=pension)
+        if form.is_valid():
+            form.save()
             messages.success(request, 'Pensión actualizada.')
             return redirect('alumno_detalle', dni=pension.alumno.dni)
-        except Exception as e:
-            messages.error(request, f'Error: {e}')
-    return render(request, 'tramites/pension_form.html', {'pension': pension, 'alumno': pension.alumno})
+    else:
+        form = PensionForm(instance=pension)
+    return render(request, 'tramites/pension_form.html', {'form': form, 'pension': pension, 'alumno': pension.alumno})
 
 
 # ------------------------------------------------------------
@@ -169,38 +149,27 @@ def pension_editar(request, pk):
 def beca_nueva(request, dni):
     alumno = get_object_or_404(Alumno, dni=dni)
     if request.method == 'POST':
-        try:
-            Beca.objects.create(
-                alumno      = alumno,
-                tipo        = request.POST['tipo'],
-                porcentaje  = request.POST['porcentaje'],
-                estado      = request.POST['estado'],
-                fecha_inicio= request.POST['fecha_inicio'],
-                fecha_fin   = request.POST.get('fecha_fin') or None,
-                observacion = request.POST.get('observacion', ''),
-            )
+        form = BecaForm(request.POST)
+        if form.is_valid():
+            form.instance.alumno = alumno
+            form.save()
             messages.success(request, 'Beca registrada.')
             return redirect('alumno_detalle', dni=dni)
-        except Exception as e:
-            messages.error(request, f'Error: {e}')
-    return render(request, 'tramites/beca_form.html', {'alumno': alumno})
+    else:
+        form = BecaForm()
+    return render(request, 'tramites/beca_form.html', {'form': form, 'alumno': alumno})
 
 def beca_editar(request, pk):
     beca = get_object_or_404(Beca, pk=pk)
     if request.method == 'POST':
-        try:
-            beca.tipo         = request.POST['tipo']
-            beca.porcentaje   = request.POST['porcentaje']
-            beca.estado       = request.POST['estado']
-            beca.fecha_inicio = request.POST['fecha_inicio']
-            beca.fecha_fin    = request.POST.get('fecha_fin') or None
-            beca.observacion  = request.POST.get('observacion', '')
-            beca.save()
+        form = BecaForm(request.POST, instance=beca)
+        if form.is_valid():
+            form.save()
             messages.success(request, 'Beca actualizada.')
             return redirect('alumno_detalle', dni=beca.alumno.dni)
-        except Exception as e:
-            messages.error(request, f'Error: {e}')
-    return render(request, 'tramites/beca_form.html', {'beca': beca, 'alumno': beca.alumno})
+    else:
+        form = BecaForm(instance=beca)
+    return render(request, 'tramites/beca_form.html', {'form': form, 'beca': beca, 'alumno': beca.alumno})
 
 
 # ------------------------------------------------------------
@@ -210,33 +179,27 @@ def beca_editar(request, pk):
 def documento_nuevo(request, dni):
     alumno = get_object_or_404(Alumno, dni=dni)
     if request.method == 'POST':
-        try:
-            Documento.objects.create(
-                alumno      = alumno,
-                tipo        = request.POST['tipo'],
-                estado      = request.POST['estado'],
-                observacion = request.POST.get('observacion', ''),
-            )
+        form = DocumentoForm(request.POST)
+        if form.is_valid():
+            form.instance.alumno = alumno
+            form.save()
             messages.success(request, 'Documento registrado.')
             return redirect('alumno_detalle', dni=dni)
-        except Exception as e:
-            messages.error(request, f'Error: {e}')
-    return render(request, 'tramites/documento_form.html', {'alumno': alumno})
+    else:
+        form = DocumentoForm()
+    return render(request, 'tramites/documento_form.html', {'form': form, 'alumno': alumno})
 
 def documento_editar(request, pk):
     doc = get_object_or_404(Documento, pk=pk)
     if request.method == 'POST':
-        try:
-            doc.tipo          = request.POST['tipo']
-            doc.estado        = request.POST['estado']
-            doc.fecha_entrega = request.POST.get('fecha_entrega') or None
-            doc.observacion   = request.POST.get('observacion', '')
-            doc.save()
+        form = DocumentoForm(request.POST, instance=doc)
+        if form.is_valid():
+            form.save()
             messages.success(request, 'Documento actualizado.')
             return redirect('alumno_detalle', dni=doc.alumno.dni)
-        except Exception as e:
-            messages.error(request, f'Error: {e}')
-    return render(request, 'tramites/documento_form.html', {'doc': doc, 'alumno': doc.alumno})
+    else:
+        form = DocumentoForm(instance=doc)
+    return render(request, 'tramites/documento_form.html', {'form': form, 'doc': doc, 'alumno': doc.alumno})
 
 
 # ------------------------------------------------------------
@@ -257,8 +220,11 @@ def carreras_lista(request):
         total_becas=Count('alumnos__becas', filter=Q(alumnos__becas__estado='vigente'), distinct=True),
         total_docs=Count('alumnos__documentos', filter=Q(alumnos__documentos__estado='en_proceso'), distinct=True),
     )
+    paginator = Paginator(carreras, 25)
+    page = request.GET.get('page', 1)
+    carreras_page = paginator.get_page(page)
     return render(request, 'tramites/carreras_lista.html', {
-        'carreras': carreras,
+        'carreras': carreras_page,
         'q': q,
         'duracion': duracion,
     })
@@ -266,24 +232,35 @@ def carreras_lista(request):
 
 def carrera_detalle(request, codigo):
     carrera = get_object_or_404(Carrera, codigo__iexact=codigo)
+    q = request.GET.get('q', '').strip()
     anio = request.GET.get('anio', '')
     ciclo = request.GET.get('ciclo', '')
     alumnos = carrera.alumnos.filter(activo=True).select_related('carrera')
+    if q:
+        alumnos = alumnos.filter(
+            Q(dni__icontains=q) | Q(nombre__icontains=q) | Q(apellido__icontains=q)
+        )
     if anio in ['1', '2', '3']:
         alumnos = alumnos.filter(anio=anio)
     if ciclo in ['1', '2', '3', '4', '5', '6']:
         alumnos = alumnos.filter(ciclo=ciclo)
 
+    total_alumnos = alumnos.count()
     total_pendientes = Pension.objects.filter(alumno__carrera=carrera, estado='pendiente').count()
     total_becas = Beca.objects.filter(alumno__carrera=carrera, estado='vigente').count()
     total_docs = Documento.objects.filter(alumno__carrera=carrera, estado='en_proceso').count()
 
+    paginator = Paginator(alumnos, 25)
+    page = request.GET.get('page', 1)
+    alumnos_page = paginator.get_page(page)
+
     return render(request, 'tramites/carrera_detalle.html', {
         'carrera': carrera,
-        'alumnos': alumnos,
+        'alumnos': alumnos_page,
+        'q': q,
         'anio': anio,
         'ciclo': ciclo,
-        'total_alumnos': alumnos.count(),
+        'total_alumnos': total_alumnos,
         'total_pendientes': total_pendientes,
         'total_becas': total_becas,
         'total_docs': total_docs,
@@ -292,17 +269,79 @@ def carrera_detalle(request, codigo):
 
 def carrera_nueva(request):
     if request.method == 'POST':
-        try:
-            Carrera.objects.create(
-                nombre   = request.POST['nombre'],
-                codigo   = request.POST['codigo'],
-                duracion = request.POST['duracion'],
-            )
+        form = CarreraForm(request.POST)
+        if form.is_valid():
+            form.save()
             messages.success(request, 'Carrera registrada.')
             return redirect('carreras_lista')
+    else:
+        form = CarreraForm()
+    return render(request, 'tramites/carrera_form.html', {'form': form, 'accion': 'Nueva'})
+
+
+# ------------------------------------------------------------
+# ELIMINAR
+# ------------------------------------------------------------
+
+def confirmar_eliminar(request, modelo, pk, redirect_url):
+    obj = get_object_or_404(modelo, pk=pk)
+    if request.method == 'POST':
+        try:
+            obj.delete()
+            messages.success(request, 'Eliminado correctamente.')
         except Exception as e:
-            messages.error(request, f'Error: {e}')
-    return render(request, 'tramites/carrera_form.html', {'accion': 'Nueva'})
+            messages.error(request, f'No se pudo eliminar: {e}')
+        return redirect(redirect_url)
+    return render(request, 'tramites/confirmar_eliminar.html', {'obj': obj})
+
+def alumno_eliminar(request, dni):
+    obj = get_object_or_404(Alumno, dni=dni)
+    if request.method == 'POST':
+        try:
+            obj.delete()
+            messages.success(request, f'Alumno {obj.nombre_completo} eliminado.')
+        except Exception as e:
+            messages.error(request, f'No se pudo eliminar: {e}')
+        return redirect('alumnos_lista')
+    return render(request, 'tramites/confirmar_eliminar.html', {'obj': obj})
+
+def pension_eliminar(request, pk):
+    obj = get_object_or_404(Pension, pk=pk)
+    dni = obj.alumno.dni
+    if request.method == 'POST':
+        obj.delete()
+        messages.success(request, 'Pensión eliminada.')
+        return redirect('alumno_detalle', dni=dni)
+    return render(request, 'tramites/confirmar_eliminar.html', {'obj': obj})
+
+def beca_eliminar(request, pk):
+    obj = get_object_or_404(Beca, pk=pk)
+    dni = obj.alumno.dni
+    if request.method == 'POST':
+        obj.delete()
+        messages.success(request, 'Beca eliminada.')
+        return redirect('alumno_detalle', dni=dni)
+    return render(request, 'tramites/confirmar_eliminar.html', {'obj': obj})
+
+def documento_eliminar(request, pk):
+    obj = get_object_or_404(Documento, pk=pk)
+    dni = obj.alumno.dni
+    if request.method == 'POST':
+        obj.delete()
+        messages.success(request, 'Documento eliminado.')
+        return redirect('alumno_detalle', dni=dni)
+    return render(request, 'tramites/confirmar_eliminar.html', {'obj': obj})
+
+def carrera_eliminar(request, codigo):
+    obj = get_object_or_404(Carrera, codigo__iexact=codigo)
+    if request.method == 'POST':
+        try:
+            obj.delete()
+            messages.success(request, 'Carrera eliminada.')
+        except Exception as e:
+            messages.error(request, f'No se pudo eliminar: {e}')
+        return redirect('carreras_lista')
+    return render(request, 'tramites/confirmar_eliminar.html', {'obj': obj})
 
 
 # ------------------------------------------------------------

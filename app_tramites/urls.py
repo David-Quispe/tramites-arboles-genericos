@@ -28,6 +28,13 @@ urlpatterns = [
     path('carreras/nueva/',      views.carrera_nueva,    name='carrera_nueva'),
     path('carreras/<str:codigo>/', views.carrera_detalle,  name='carrera_detalle'),
 
+    # Eliminar
+    path('alumnos/<str:dni>/eliminar/',        views.alumno_eliminar,    name='alumno_eliminar'),
+    path('pension/<int:pk>/eliminar/',         views.pension_eliminar,   name='pension_eliminar'),
+    path('beca/<int:pk>/eliminar/',            views.beca_eliminar,      name='beca_eliminar'),
+    path('documento/<int:pk>/eliminar/',       views.documento_eliminar, name='documento_eliminar'),
+    path('carreras/<str:codigo>/eliminar/',    views.carrera_eliminar,   name='carrera_eliminar'),
+
     # API árbol
     path('api/arbol/',                     views.api_arbol,        name='api_arbol'),
     path('api/nodo/<int:nodo_id>/',        views.api_nodo,         name='api_nodo'),

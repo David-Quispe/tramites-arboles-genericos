@@ -38,6 +38,7 @@
                     <td>
                         <a href="{% url 'alumno_detalle' a.dni %}" class="btn btn-sm btn-blue">Ver</a>
                         <a href="{% url 'alumno_editar' a.dni %}" class="btn btn-sm">Editar</a>
+                        <a href="{% url 'alumno_eliminar' a.dni %}" class="btn btn-sm btn-danger">Eliminar</a>
                     </td>
                 </tr>
                 {% empty %}
@@ -46,5 +47,16 @@
             </tbody>
         </table>
     </div>
+    {% if alumnos.paginator.num_pages > 1 %}
+    <div class="card-footer pagination-nav">
+        {% if alumnos.has_previous %}
+            <a href="?page={{ alumnos.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if carrera_cod %}&carrera={{ carrera_cod }}{% endif %}{% if anio %}&anio={{ anio }}{% endif %}{% if ciclo %}&ciclo={{ ciclo }}{% endif %}" class="btn btn-sm">← Anterior</a>
+        {% endif %}
+        <span class="text-sm">Página {{ alumnos.number }} de {{ alumnos.paginator.num_pages }}</span>
+        {% if alumnos.has_next %}
+            <a href="?page={{ alumnos.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if carrera_cod %}&carrera={{ carrera_cod }}{% endif %}{% if anio %}&anio={{ anio }}{% endif %}{% if ciclo %}&ciclo={{ ciclo }}{% endif %}" class="btn btn-sm">Siguiente →</a>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

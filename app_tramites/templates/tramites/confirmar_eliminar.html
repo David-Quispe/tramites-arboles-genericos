@@ -1,0 +1,20 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}Confirmar eliminación{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 2rem auto;">
+    <div class="card-header">¿Eliminar {{ obj|yesno:"este registro,este registro" }}?</div>
+    <div class="card-body">
+        <p style="margin-bottom:1.5rem; color: var(--text-muted);">
+            ¿Estás seguro de eliminar <strong>{{ obj }}</strong>?
+            {% if obj|yesno:",," %}Esta acción no se puede deshacer.{% endif %}
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <div style="display:flex; gap:0.5rem;">
+                <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                <a href="javascript:history.back()" class="btn btn-sm">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -12,38 +12,15 @@
     <div class="card-body">
         <form method="post" class="form-grid">
             {% csrf_token %}
-            <div class="form-group">
-                <label class="form-label" for="mes">Mes</label>
-                <select id="mes" name="mes" class="form-control" required>
-                    {% for k,v in [(1,'Enero'),(2,'Febrero'),(3,'Marzo'),(4,'Abril'),(5,'Mayo'),(6,'Junio'),(7,'Julio'),(8,'Agosto'),(9,'Septiembre'),(10,'Octubre'),(11,'Noviembre'),(12,'Diciembre')] %}
-                        <option value="{{ k }}" {% if pension and pension.mes == k %}selected{% endif %}>{{ v }}</option>
-                    {% endfor %}
-                </select>
+            {% for field in form %}
+            <div class="form-group{% if field.field.widget.input_type == 'textarea' %} full{% endif %}">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="field-errors">{{ field.errors }}</div>
+                {% endif %}
             </div>
-            <div class="form-group">
-                <label class="form-label" for="anio">Año</label>
-                <input id="anio" name="anio" type="number" class="form-control" value="{{ pension.anio|default:'' }}" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="monto">Monto</label>
-                <input id="monto" name="monto" type="number" step="0.01" class="form-control" value="{{ pension.monto|default:'' }}" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="estado">Estado</label>
-                <select id="estado" name="estado" class="form-control" required>
-                    {% for k,v in [('pendiente','Pendiente'),('pagado','Pagado'),('vencido','Vencido')] %}
-                        <option value="{{ k }}" {% if pension and pension.estado == k %}selected{% endif %}>{{ v }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="fecha_pago">Fecha de Pago</label>
-                <input id="fecha_pago" name="fecha_pago" type="date" class="form-control" value="{{ pension.fecha_pago|default:'' }}">
-            </div>
-            <div class="form-group full">
-                <label class="form-label" for="observacion">Observación</label>
-                <textarea id="observacion" name="observacion" class="form-control">{{ pension.observacion|default:'' }}</textarea>
-            </div>
+            {% endfor %}
             <div class="form-group full">
                 <button type="submit" class="btn btn-primary">Guardar</button>
             </div>

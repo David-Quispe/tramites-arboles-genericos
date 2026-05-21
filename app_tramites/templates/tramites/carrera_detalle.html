@@ -24,6 +24,7 @@
     <div class="card-header">Filtrar alumnos</div>
     <div class="card-body">
         <form method="get" class="search-form">
+            <input type="text" name="q" value="{{ q }}" placeholder="DNI, nombre o apellido..." class="input-search">
             <select name="anio" class="filter-select">
                 <option value="">Todos los años</option>
                 <option value="1" {% if anio == '1' %}selected{% endif %}>1er año</option>
@@ -40,7 +41,7 @@
                 <option value="6" {% if ciclo == '6' %}selected{% endif %}>Ciclo VI</option>
             </select>
             <button type="submit" class="btn btn-primary">Aplicar</button>
-            {% if anio or ciclo %}<a href="{% url 'carrera_detalle' carrera.codigo %}" class="btn btn-sm">Limpiar</a>{% endif %}
+            {% if q or anio or ciclo %}<a href="{% url 'carrera_detalle' carrera.codigo %}" class="btn btn-sm">Limpiar</a>{% endif %}
         </form>
     </div>
 </div>
@@ -75,5 +76,16 @@
             </tbody>
         </table>
     </div>
+    {% if alumnos.paginator.num_pages > 1 %}
+    <div class="card-footer pagination-nav">
+        {% if alumnos.has_previous %}
+            <a href="?page={{ alumnos.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if anio %}&anio={{ anio }}{% endif %}{% if ciclo %}&ciclo={{ ciclo }}{% endif %}" class="btn btn-sm">← Anterior</a>
+        {% endif %}
+        <span class="text-sm">Página {{ alumnos.number }} de {{ alumnos.paginator.num_pages }}</span>
+        {% if alumnos.has_next %}
+            <a href="?page={{ alumnos.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if anio %}&anio={{ anio }}{% endif %}{% if ciclo %}&ciclo={{ ciclo }}{% endif %}" class="btn btn-sm">Siguiente →</a>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

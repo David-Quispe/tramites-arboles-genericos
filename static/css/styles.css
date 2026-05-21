@@ -200,6 +200,16 @@ body {
 }
 .card + .card, .card.mt-1 { margin-top: 16px; }
 .card.mb-2 { margin-bottom: 16px; }
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+  font-size: .875rem;
+}
+.pagination-nav { display: flex; align-items: center; gap: 12px; }
 .card-header {
   display: flex;
   align-items: center;
@@ -523,3 +533,8 @@ textarea.form-control { resize:vertical; min-height:80px; }
 .d-flex      { display:flex; }
 .align-center { align-items:center; }
 .gap-8       { gap:8px; }
+
+/* ══ FORM ERRORS ══ */
+.field-errors { color: #dc2626; font-size: .78rem; margin-top: 4px; }
+.field-errors ul { list-style: none; padding: 0; margin: 0; }
+.errorlist { color: #dc2626; font-size: .78rem; list-style: none; padding: 0; margin: 4px 0 0; }

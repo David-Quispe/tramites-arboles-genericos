@@ -12,38 +12,15 @@
     <div class="card-body">
         <form method="post" class="form-grid">
             {% csrf_token %}
-            <div class="form-group">
-                <label class="form-label" for="tipo">Tipo</label>
-                <select id="tipo" name="tipo" class="form-control" required>
-                    {% for k,v in [('excelencia','Beca Excelencia'),('necesidad','Beca por Necesidad'),('deportiva','Beca Deportiva'),('convenio','Beca por Convenio')] %}
-                        <option value="{{ k }}" {% if beca and beca.tipo == k %}selected{% endif %}>{{ v }}</option>
-                    {% endfor %}
-                </select>
+            {% for field in form %}
+            <div class="form-group{% if field.field.widget.input_type == 'textarea' %} full{% endif %}">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="field-errors">{{ field.errors }}</div>
+                {% endif %}
             </div>
-            <div class="form-group">
-                <label class="form-label" for="porcentaje">Porcentaje</label>
-                <input id="porcentaje" name="porcentaje" type="number" class="form-control" value="{{ beca.porcentaje|default:'' }}" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="estado">Estado</label>
-                <select id="estado" name="estado" class="form-control" required>
-                    {% for k,v in [('solicitada','Solicitada'),('aprobada','Aprobada'),('rechazada','Rechazada'),('vigente','Vigente'),('finalizada','Finalizada')] %}
-                        <option value="{{ k }}" {% if beca and beca.estado == k %}selected{% endif %}>{{ v }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="fecha_inicio">Fecha inicio</label>
-                <input id="fecha_inicio" name="fecha_inicio" type="date" class="form-control" value="{{ beca.fecha_inicio|default:'' }}" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="fecha_fin">Fecha fin</label>
-                <input id="fecha_fin" name="fecha_fin" type="date" class="form-control" value="{{ beca.fecha_fin|default:'' }}">
-            </div>
-            <div class="form-group full">
-                <label class="form-label" for="observacion">Observación</label>
-                <textarea id="observacion" name="observacion" class="form-control">{{ beca.observacion|default:'' }}</textarea>
-            </div>
+            {% endfor %}
             <div class="form-group full">
                 <button type="submit" class="btn btn-primary">Guardar</button>
             </div>

@@ -12,30 +12,15 @@
     <div class="card-body">
         <form method="post" class="form-grid">
             {% csrf_token %}
-            <div class="form-group">
-                <label class="form-label" for="tipo">Tipo</label>
-                <select id="tipo" name="tipo" class="form-control" required>
-                    {% for k,v in [('certificado_notas','Certificado de Notas'),('certificado_estudios','Certificado de Estudios'),('constancia','Constancia de Estudios'),('titulo','Título Profesional')] %}
-                        <option value="{{ k }}" {% if doc and doc.tipo == k %}selected{% endif %}>{{ v }}</option>
-                    {% endfor %}
-                </select>
+            {% for field in form %}
+            <div class="form-group{% if field.field.widget.input_type == 'textarea' %} full{% endif %}">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="field-errors">{{ field.errors }}</div>
+                {% endif %}
             </div>
-            <div class="form-group">
-                <label class="form-label" for="estado">Estado</label>
-                <select id="estado" name="estado" class="form-control" required>
-                    {% for k,v in [('solicitado','Solicitado'),('en_proceso','En Proceso'),('listo','Listo para recoger'),('entregado','Entregado')] %}
-                        <option value="{{ k }}" {% if doc and doc.estado == k %}selected{% endif %}>{{ v }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="fecha_entrega">Fecha entrega</label>
-                <input id="fecha_entrega" name="fecha_entrega" type="date" class="form-control" value="{{ doc.fecha_entrega|default:'' }}">
-            </div>
-            <div class="form-group full">
-                <label class="form-label" for="observacion">Observación</label>
-                <textarea id="observacion" name="observacion" class="form-control">{{ doc.observacion|default:'' }}</textarea>
-            </div>
+            {% endfor %}
             <div class="form-group full">
                 <button type="submit" class="btn btn-primary">Guardar</button>
             </div>

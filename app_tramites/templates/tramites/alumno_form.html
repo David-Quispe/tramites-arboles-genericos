@@ -12,52 +12,15 @@
     <div class="card-body">
         <form method="post" class="form-grid">
             {% csrf_token %}
-            <div class="form-group">
-                <label class="form-label" for="dni">DNI</label>
-                <input id="dni" name="dni" type="text" class="form-control" value="{{ alumno.dni|default:'' }}" required>
+            {% for field in form %}
+            <div class="form-group{% if field.field.widget.input_type == 'textarea' or field.name == 'dni' %} full{% endif %}">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="field-errors">{{ field.errors }}</div>
+                {% endif %}
             </div>
-            <div class="form-group">
-                <label class="form-label" for="nombre">Nombre</label>
-                <input id="nombre" name="nombre" type="text" class="form-control" value="{{ alumno.nombre|default:'' }}" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="apellido">Apellido</label>
-                <input id="apellido" name="apellido" type="text" class="form-control" value="{{ alumno.apellido|default:'' }}" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="carrera">Carrera</label>
-                <select id="carrera" name="carrera" class="form-control" required>
-                    <option value="">Seleccione...</option>
-                    {% for carrera in carreras %}
-                        <option value="{{ carrera.pk }}" {% if alumno and alumno.carrera_id == carrera.pk %}selected{% endif %}>{{ carrera.codigo }} — {{ carrera.nombre }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="anio">Año</label>
-                <select id="anio" name="anio" class="form-control" required>
-                    <option value="">Seleccione...</option>
-                    <option value="1" {% if alumno and alumno.anio == 1 %}selected{% endif %}>1er año</option>
-                    <option value="2" {% if alumno and alumno.anio == 2 %}selected{% endif %}>2do año</option>
-                    <option value="3" {% if alumno and alumno.anio == 3 %}selected{% endif %}>3er año</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="ciclo">Ciclo</label>
-                <select id="ciclo" name="ciclo" class="form-control" required>
-                    <option value="">Seleccione...</option>
-                    <option value="1" {% if alumno and alumno.ciclo == 1 %}selected{% endif %}>Ciclo I</option>
-                    <option value="2" {% if alumno and alumno.ciclo == 2 %}selected{% endif %}>Ciclo II</option>
-                    <option value="3" {% if alumno and alumno.ciclo == 3 %}selected{% endif %}>Ciclo III</option>
-                    <option value="4" {% if alumno and alumno.ciclo == 4 %}selected{% endif %}>Ciclo IV</option>
-                    <option value="5" {% if alumno and alumno.ciclo == 5 %}selected{% endif %}>Ciclo V</option>
-                    <option value="6" {% if alumno and alumno.ciclo == 6 %}selected{% endif %}>Ciclo VI</option>
-                </select>
-            </div>
-            <div class="form-group full">
-                <label class="form-label" for="fecha_ingreso">Fecha de ingreso</label>
-                <input id="fecha_ingreso" name="fecha_ingreso" type="date" class="form-control" value="{{ alumno.fecha_ingreso|default:'' }}" required>
-            </div>
+            {% endfor %}
             <div class="form-group full">
                 <button type="submit" class="btn btn-primary">Guardar</button>
             </div>
