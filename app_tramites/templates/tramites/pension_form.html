@@ -1,0 +1,53 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}{% if pension %}Editar{% else %}Nueva{% endif %} Pensión{% endblock %}
+{% block nav_alumnos %}active{% endblock %}
+{% block topbar_titulo %}{% if pension %}Editar{% else %}Nueva{% endif %} Pensión{% endblock %}
+{% block topbar_acciones %}
+    <a href="{% url 'alumno_detalle' alumno.dni %}" class="btn btn-sm">← Volver</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">{% if pension %}Editar{% else %}Nueva{% endif %} Pensión</div>
+    <div class="card-body">
+        <form method="post" class="form-grid">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label" for="mes">Mes</label>
+                <select id="mes" name="mes" class="form-control" required>
+                    {% for k,v in [(1,'Enero'),(2,'Febrero'),(3,'Marzo'),(4,'Abril'),(5,'Mayo'),(6,'Junio'),(7,'Julio'),(8,'Agosto'),(9,'Septiembre'),(10,'Octubre'),(11,'Noviembre'),(12,'Diciembre')] %}
+                        <option value="{{ k }}" {% if pension and pension.mes == k %}selected{% endif %}>{{ v }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="anio">Año</label>
+                <input id="anio" name="anio" type="number" class="form-control" value="{{ pension.anio|default:'' }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="monto">Monto</label>
+                <input id="monto" name="monto" type="number" step="0.01" class="form-control" value="{{ pension.monto|default:'' }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="estado">Estado</label>
+                <select id="estado" name="estado" class="form-control" required>
+                    {% for k,v in [('pendiente','Pendiente'),('pagado','Pagado'),('vencido','Vencido')] %}
+                        <option value="{{ k }}" {% if pension and pension.estado == k %}selected{% endif %}>{{ v }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="fecha_pago">Fecha de Pago</label>
+                <input id="fecha_pago" name="fecha_pago" type="date" class="form-control" value="{{ pension.fecha_pago|default:'' }}">
+            </div>
+            <div class="form-group full">
+                <label class="form-label" for="observacion">Observación</label>
+                <textarea id="observacion" name="observacion" class="form-control">{{ pension.observacion|default:'' }}</textarea>
+            </div>
+            <div class="form-group full">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

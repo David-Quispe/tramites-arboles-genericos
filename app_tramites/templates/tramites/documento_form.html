@@ -1,0 +1,45 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}{% if doc %}Editar{% else %}Nueva{% endif %} Documento{% endblock %}
+{% block nav_alumnos %}active{% endblock %}
+{% block topbar_titulo %}{% if doc %}Editar{% else %}Nueva{% endif %} Documento{% endblock %}
+{% block topbar_acciones %}
+    <a href="{% url 'alumno_detalle' alumno.dni %}" class="btn btn-sm">← Volver</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">{% if doc %}Editar{% else %}Nueva{% endif %} Documento</div>
+    <div class="card-body">
+        <form method="post" class="form-grid">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label" for="tipo">Tipo</label>
+                <select id="tipo" name="tipo" class="form-control" required>
+                    {% for k,v in [('certificado_notas','Certificado de Notas'),('certificado_estudios','Certificado de Estudios'),('constancia','Constancia de Estudios'),('titulo','Título Profesional')] %}
+                        <option value="{{ k }}" {% if doc and doc.tipo == k %}selected{% endif %}>{{ v }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="estado">Estado</label>
+                <select id="estado" name="estado" class="form-control" required>
+                    {% for k,v in [('solicitado','Solicitado'),('en_proceso','En Proceso'),('listo','Listo para recoger'),('entregado','Entregado')] %}
+                        <option value="{{ k }}" {% if doc and doc.estado == k %}selected{% endif %}>{{ v }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="fecha_entrega">Fecha entrega</label>
+                <input id="fecha_entrega" name="fecha_entrega" type="date" class="form-control" value="{{ doc.fecha_entrega|default:'' }}">
+            </div>
+            <div class="form-group full">
+                <label class="form-label" for="observacion">Observación</label>
+                <textarea id="observacion" name="observacion" class="form-control">{{ doc.observacion|default:'' }}</textarea>
+            </div>
+            <div class="form-group full">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

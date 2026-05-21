@@ -24,8 +24,9 @@ urlpatterns = [
     path('documento/<int:pk>/editar/',         views.documento_editar, name='documento_editar'),
 
     # Carreras
-    path('carreras/',       views.carreras_lista, name='carreras_lista'),
-    path('carreras/nueva/', views.carrera_nueva,  name='carrera_nueva'),
+    path('carreras/',            views.carreras_lista,   name='carreras_lista'),
+    path('carreras/nueva/',      views.carrera_nueva,    name='carrera_nueva'),
+    path('carreras/<str:codigo>/', views.carrera_detalle,  name='carrera_detalle'),
 
     # API árbol
     path('api/arbol/',                     views.api_arbol,        name='api_arbol'),

@@ -74,8 +74,9 @@
     </div>
 </div>
 
+{{ arbol_json|json_script:"arbol-data" }}
 <script>
-    const ARBOL_DATA = {{ arbol_json|safe }};
+    const ARBOL_DATA = JSON.parse(document.getElementById('arbol-data').textContent);
     document.addEventListener('DOMContentLoaded', () => renderTree(ARBOL_DATA, document.getElementById('tree'), 0));
 
     function buscarNodo() {

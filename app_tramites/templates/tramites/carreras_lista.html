@@ -1,0 +1,63 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}Carreras{% endblock %}
+{% block nav_carreras %}active{% endblock %}
+{% block topbar_titulo %}Gestión de Carreras{% endblock %}
+{% block topbar_acciones %}
+    <a href="{% url 'carrera_nueva' %}" class="btn btn-primary">+ Nueva Carrera</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">🔎 Filtrar Carreras</div>
+    <div class="card-body">
+        <form method="get" class="search-form">
+            <input type="text" name="q" value="{{ q }}" placeholder="Código o nombre..." class="input-search">
+            <select name="duracion" class="filter-select">
+                <option value="">Todas las duraciones</option>
+                <option value="2" {% if duracion == '2' %}selected{% endif %}>2 años</option>
+                <option value="3" {% if duracion == '3' %}selected{% endif %}>3 años</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            {% if q or duracion %}<a href="{% url 'carreras_lista' %}" class="btn btn-sm">Limpiar</a>{% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="card mt-1">
+    <div class="card-header">Carreras disponibles</div>
+    <div class="card-body p-0">
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Duración</th>
+                    <th>Alumnos</th>
+                    <th>Pendientes</th>
+                    <th>Becas</th>
+                    <th>Documentos</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for carrera in carreras %}
+                <tr>
+                    <td><strong>{{ carrera.codigo }}</strong></td>
+                    <td>{{ carrera.nombre }}</td>
+                    <td>{{ carrera.get_duracion_display }}</td>
+                    <td>{{ carrera.total_alumnos }}</td>
+                    <td>{{ carrera.total_pendientes }}</td>
+                    <td>{{ carrera.total_becas }}</td>
+                    <td>{{ carrera.total_docs }}</td>
+                    <td>
+                        <a href="{% url 'carrera_detalle' carrera.codigo %}" class="btn btn-sm btn-blue">Ver</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="text-center">No se encontraron carreras.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

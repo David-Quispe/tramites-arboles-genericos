@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.contrib import messages
+from django.db.models import Count, Q
 from .models import NodoTramite, Alumno, Carrera, Pension, Beca, Documento
 from .tree_logic.generic_tree import NodoArbol, ArbolGenerico
 
@@ -45,11 +46,30 @@ def index(request):
 # ------------------------------------------------------------
 
 def alumnos_lista(request):
-    q = request.GET.get('q', '')
+    q = request.GET.get('q', '').strip()
+    carrera_cod = request.GET.get('carrera', '').strip()
+    anio = request.GET.get('anio', '').strip()
+    ciclo = request.GET.get('ciclo', '').strip()
+    carreras = Carrera.objects.all()
     alumnos = Alumno.objects.select_related('carrera').filter(activo=True)
     if q:
-        alumnos = alumnos.filter(dni__icontains=q) | alumnos.filter(nombre__icontains=q) | alumnos.filter(apellido__icontains=q)
-    return render(request, 'tramites/alumnos_lista.html', {'alumnos': alumnos, 'q': q})
+        alumnos = alumnos.filter(
+            Q(dni__icontains=q) | Q(nombre__icontains=q) | Q(apellido__icontains=q)
+        )
+    if carrera_cod:
+        alumnos = alumnos.filter(carrera__codigo__icontains=carrera_cod)
+    if anio in ['1', '2', '3']:
+        alumnos = alumnos.filter(anio=anio)
+    if ciclo in ['1', '2', '3', '4', '5', '6']:
+        alumnos = alumnos.filter(ciclo=ciclo)
+    return render(request, 'tramites/alumnos_lista.html', {
+        'alumnos': alumnos,
+        'q': q,
+        'carreras': carreras,
+        'carrera_cod': carrera_cod,
+        'anio': anio,
+        'ciclo': ciclo,
+    })
 
 def alumno_detalle(request, dni):
     alumno = get_object_or_404(Alumno, dni=dni)
@@ -224,8 +244,51 @@ def documento_editar(request, pk):
 # ------------------------------------------------------------
 
 def carreras_lista(request):
+    q = request.GET.get('q', '').strip()
+    duracion = request.GET.get('duracion', '')
     carreras = Carrera.objects.all()
-    return render(request, 'tramites/carreras_lista.html', {'carreras': carreras})
+    if q:
+        carreras = carreras.filter(Q(codigo__icontains=q) | Q(nombre__icontains=q))
+    if duracion in ['2', '3']:
+        carreras = carreras.filter(duracion=duracion)
+    carreras = carreras.annotate(
+        total_alumnos=Count('alumnos', filter=Q(alumnos__activo=True), distinct=True),
+        total_pendientes=Count('alumnos__pensiones', filter=Q(alumnos__pensiones__estado='pendiente'), distinct=True),
+        total_becas=Count('alumnos__becas', filter=Q(alumnos__becas__estado='vigente'), distinct=True),
+        total_docs=Count('alumnos__documentos', filter=Q(alumnos__documentos__estado='en_proceso'), distinct=True),
+    )
+    return render(request, 'tramites/carreras_lista.html', {
+        'carreras': carreras,
+        'q': q,
+        'duracion': duracion,
+    })
+
+
+def carrera_detalle(request, codigo):
+    carrera = get_object_or_404(Carrera, codigo__iexact=codigo)
+    anio = request.GET.get('anio', '')
+    ciclo = request.GET.get('ciclo', '')
+    alumnos = carrera.alumnos.filter(activo=True).select_related('carrera')
+    if anio in ['1', '2', '3']:
+        alumnos = alumnos.filter(anio=anio)
+    if ciclo in ['1', '2', '3', '4', '5', '6']:
+        alumnos = alumnos.filter(ciclo=ciclo)
+
+    total_pendientes = Pension.objects.filter(alumno__carrera=carrera, estado='pendiente').count()
+    total_becas = Beca.objects.filter(alumno__carrera=carrera, estado='vigente').count()
+    total_docs = Documento.objects.filter(alumno__carrera=carrera, estado='en_proceso').count()
+
+    return render(request, 'tramites/carrera_detalle.html', {
+        'carrera': carrera,
+        'alumnos': alumnos,
+        'anio': anio,
+        'ciclo': ciclo,
+        'total_alumnos': alumnos.count(),
+        'total_pendientes': total_pendientes,
+        'total_becas': total_becas,
+        'total_docs': total_docs,
+    })
+
 
 def carrera_nueva(request):
     if request.method == 'POST':
