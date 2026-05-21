@@ -1,106 +1,150 @@
 {% extends 'tramites/base.html' %}
 {% block titulo %}Dashboard{% endblock %}
-{% block nav_inicio %}active{% endblock %}
+{% block topbar_icon %}layout-dashboard{% endblock %}
 {% block topbar_titulo %}Dashboard Principal{% endblock %}
+{% block nav_inicio %}active{% endblock %}
+
 {% block topbar_acciones %}
-    <a href="{% url 'alumno_nuevo' %}" class="btn btn-primary">+ Nuevo Alumno</a>
+  <a href="{% url 'alumno_nuevo' %}" class="btn btn-primary">
+    <i class="ti ti-user-plus" aria-hidden="true"></i> Nuevo Alumno
+  </a>
 {% endblock %}
 
 {% block content %}
 
-<!-- Tarjetas resumen -->
 <div class="stats-grid">
-    <div class="stat-card stat-blue">
-        <div class="stat-icon">🎓</div>
-        <div class="stat-info">
-            <div class="stat-num">{{ total_alumnos }}</div>
-            <div class="stat-label">Alumnos Activos</div>
-        </div>
+  <div class="stat-card stat-blue">
+    <div class="stat-icon"><i class="ti ti-school" aria-hidden="true"></i></div>
+    <div class="stat-info">
+      <div class="stat-num">{{ total_alumnos }}</div>
+      <div class="stat-label">Alumnos Activos</div>
     </div>
-    <div class="stat-card stat-red">
-        <div class="stat-icon">💳</div>
-        <div class="stat-info">
-            <div class="stat-num">{{ total_pendientes }}</div>
-            <div class="stat-label">Pensiones Pendientes</div>
-        </div>
+  </div>
+  <div class="stat-card stat-red">
+    <div class="stat-icon"><i class="ti ti-credit-card" aria-hidden="true"></i></div>
+    <div class="stat-info">
+      <div class="stat-num">{{ total_pendientes }}</div>
+      <div class="stat-label">Pensiones Pendientes</div>
     </div>
-    <div class="stat-card stat-green">
-        <div class="stat-icon">🏅</div>
-        <div class="stat-info">
-            <div class="stat-num">{{ total_becas }}</div>
-            <div class="stat-label">Becas Vigentes</div>
-        </div>
+  </div>
+  <div class="stat-card stat-green">
+    <div class="stat-icon"><i class="ti ti-award" aria-hidden="true"></i></div>
+    <div class="stat-info">
+      <div class="stat-num">{{ total_becas }}</div>
+      <div class="stat-label">Becas Vigentes</div>
     </div>
-    <div class="stat-card stat-yellow">
-        <div class="stat-icon">📄</div>
-        <div class="stat-info">
-            <div class="stat-num">{{ total_docs }}</div>
-            <div class="stat-label">Documentos en Proceso</div>
-        </div>
+  </div>
+  <div class="stat-card stat-yellow">
+    <div class="stat-icon"><i class="ti ti-file-text" aria-hidden="true"></i></div>
+    <div class="stat-info">
+      <div class="stat-num">{{ total_docs }}</div>
+      <div class="stat-label">Documentos en Proceso</div>
     </div>
+  </div>
 </div>
 
-<!-- Buscador rápido -->
 <div class="card mb-2">
-    <div class="card-header">🔍 Búsqueda Rápida de Alumno</div>
-    <div class="card-body">
-        <form action="{% url 'alumnos_lista' %}" method="get" class="search-form">
-            <input type="text" name="q" placeholder="Buscar por DNI, nombre o apellido..." class="input-search">
-            <button type="submit" class="btn btn-primary">Buscar</button>
-        </form>
+  <div class="card-header">
+    <div class="card-header-left">
+      <i class="ti ti-search" aria-hidden="true"></i>
+      Búsqueda Rápida de Alumno
     </div>
+  </div>
+  <div class="card-body">
+    <form action="{% url 'alumnos_lista' %}" method="get" class="search-form">
+      <input type="text" name="q" placeholder="Buscar por DNI, nombre o apellido..." class="input-search">
+      <select name="carrera" class="filter-select">
+        <option value="">Todas las carreras</option>
+        {% for c in carreras %}<option value="{{ c.id }}">{{ c.codigo }} — {{ c.nombre }}</option>{% endfor %}
+      </select>
+      <select name="anio" class="filter-select">
+        <option value="">Todos los años</option>
+        <option value="1">1er Año</option>
+        <option value="2">2do Año</option>
+        <option value="3">3er Año</option>
+      </select>
+      <select name="ciclo" class="filter-select">
+        <option value="">Todos los ciclos</option>
+        <option value="1">Ciclo I</option>
+        <option value="2">Ciclo II</option>
+        <option value="3">Ciclo III</option>
+        <option value="4">Ciclo IV</option>
+        <option value="5">Ciclo V</option>
+        <option value="6">Ciclo VI</option>
+      </select>
+      <button type="submit" class="btn btn-primary">
+        <i class="ti ti-search" aria-hidden="true"></i> Buscar
+      </button>
+    </form>
+  </div>
 </div>
 
-<!-- Árbol de trámites -->
 <div class="card">
-    <div class="card-header">
-        🌳 Árbol de Trámites
-        <div style="display:flex;align-items:center;gap:8px;">
-            <div class="tree-stats">
-                <span class="badge">Altura: {{ altura }}</span>
-                <span class="badge">Nodos: {{ total_nodos }}</span>
-                <span class="badge">Hojas: {{ total_hojas }}</span>
-            </div>
-            <a href="{% url 'nodo_nuevo' %}" class="btn btn-sm btn-primary">+ Nodo Raíz</a>
-        </div>
+  <div class="card-header">
+    <div class="card-header-left">
+      <i class="ti ti-binary-tree" aria-hidden="true"></i>
+      Árbol de Trámites
+      <div class="tree-stats">
+        <span class="badge">Altura: {{ altura }}</span>
+        <span class="badge">Nodos: {{ total_nodos }}</span>
+        <span class="badge">Hojas: {{ total_hojas }}</span>
+      </div>
     </div>
-    <div class="card-body">
-        <div class="recorrido-btns">
-            <button onclick="verRecorrido('dfs')" class="btn btn-sm">Ver DFS</button>
-            <button onclick="verRecorrido('bfs')" class="btn btn-sm">Ver BFS</button>
-            <input type="text" id="searchInput" placeholder="Buscar nodo..." class="input-sm">
-            <button onclick="buscarNodo()" class="btn btn-sm">Buscar</button>
-            <span id="searchResult"></span>
-        </div>
-        <div id="recorridoOutput" class="recorrido-list" style="display:none"></div>
-        <div id="tree"></div>
+  </div>
+  <div class="card-body">
+    <div class="tree-toolbar">
+      <button onclick="verRecorrido('dfs')" class="btn btn-secondary btn-sm">
+        <i class="ti ti-arrows-down" aria-hidden="true"></i> DFS
+      </button>
+      <button onclick="verRecorrido('bfs')" class="btn btn-secondary btn-sm">
+        <i class="ti ti-arrows-right" aria-hidden="true"></i> BFS
+      </button>
+      <input type="text" id="searchInput" placeholder="Buscar nodo..." class="input-sm">
+      <button onclick="buscarNodo()" class="btn btn-secondary btn-sm">
+        <i class="ti ti-search" aria-hidden="true"></i> Buscar
+      </button>
+      <span id="searchResult"></span>
     </div>
+    <div id="recorridoOutput" class="recorrido-list" style="display:none"></div>
+    <div id="tree"></div>
+  </div>
 </div>
 
-{{ arbol_json|json_script:"arbol-data" }}
 <script>
-    const ARBOL_DATA = JSON.parse(document.getElementById('arbol-data').textContent);
-    document.addEventListener('DOMContentLoaded', () => renderTree(ARBOL_DATA, document.getElementById('tree'), 0));
+  const ARBOL_DATA = {{ arbol_json|safe }};
+  document.addEventListener('DOMContentLoaded', () =>
+    renderTree(ARBOL_DATA, document.getElementById('tree'), 0)
+  );
 
-    function buscarNodo() {
-        const q = document.getElementById('searchInput').value;
-        fetch(`/api/buscar/?q=${encodeURIComponent(q)}`)
-            .then(r => r.json())
-            .then(data => {
-                const el = document.getElementById('searchResult');
-                el.textContent = data.encontrado ? `✅ ${data.nombre} (ID: ${data.id})` : '❌ No encontrado';
-            });
-    }
+  function buscarNodo() {
+    const q = document.getElementById('searchInput').value.trim();
+    if (!q) return;
+    fetch(`/api/buscar/?q=${encodeURIComponent(q)}`)
+      .then(r => r.json())
+      .then(data => {
+        const el = document.getElementById('searchResult');
+        if (data.encontrado) {
+          el.className = 'found';
+          el.textContent = `✓ ${data.nombre} (ID: ${data.id})`;
+          highlightNode(data.id);
+        } else {
+          el.className = 'notfound';
+          el.textContent = '✗ No encontrado';
+        }
+      });
+  }
 
-    function verRecorrido(tipo) {
-        fetch(`/api/recorrido/?tipo=${tipo}`)
-            .then(r => r.json())
-            .then(data => {
-                const out = document.getElementById('recorridoOutput');
-                out.style.display = 'block';
-                out.innerHTML = `<strong>${data.tipo}:</strong> ` +
-                    data.recorrido.map(n => `<span class="nivel-tag nivel-${n.nivel}">${n.nombre}</span>`).join(' → ');
-            });
-    }
+  function verRecorrido(tipo) {
+    fetch(`/api/recorrido/?tipo=${tipo}`)
+      .then(r => r.json())
+      .then(data => {
+        const out = document.getElementById('recorridoOutput');
+        out.style.display = 'block';
+        out.innerHTML = `<strong>${data.tipo}:</strong> ` +
+          data.recorrido.map(n =>
+            `<span class="nivel-tag nivel-${n.nivel}">${n.nombre}</span>`
+          ).join(' → ');
+      });
+  }
 </script>
 {% endblock %}
