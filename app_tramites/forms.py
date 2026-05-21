@@ -1,5 +1,24 @@
 from django import forms
-from .models import Alumno, Carrera, Pension, Beca, Documento
+from .models import NodoTramite, Alumno, Carrera, Pension, Beca, Documento
+
+class NodoTramiteForm(forms.ModelForm):
+    class Meta:
+        model = NodoTramite
+        fields = ['nombre', 'descripcion', 'padre', 'orden', 'enlace']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'padre': forms.Select(attrs={'class': 'form-control'}),
+            'orden': forms.NumberInput(attrs={'class': 'form-control'}),
+            'enlace': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Ej: /alumnos/'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['padre'].queryset = NodoTramite.objects.all()
+        self.fields['padre'].required = False
+        self.fields['padre'].empty_label = '-- Nodo raíz --'
+
 
 class AlumnoForm(forms.ModelForm):
     class Meta:

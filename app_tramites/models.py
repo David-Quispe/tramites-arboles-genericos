@@ -13,13 +13,17 @@ class NodoTramite(models.Model):
         on_delete=models.CASCADE,
         related_name='hijos'
     )
-    orden = models.IntegerField(default=0)
+    orden       = models.IntegerField(default=0)
+    enlace      = models.CharField(max_length=500, blank=True, help_text='URL opcional a la que redirige este nodo (ej: /alumnos/)')
 
     class Meta:
         ordering = ['orden', 'nombre']
 
     def __str__(self):
         return self.nombre
+
+    def es_hoja(self):
+        return not self.hijos.exists()
 
 
 # ------------------------------------------------------------

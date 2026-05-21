@@ -1,0 +1,33 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}{{ accion }} Nodo{% endblock %}
+{% block nav_inicio %}active{% endblock %}
+{% block topbar_titulo %}{{ accion }} Nodo del Árbol{% endblock %}
+{% block topbar_acciones %}
+    <a href="{% url 'index' %}" class="btn btn-sm">← Volver al Árbol</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">{{ accion }} Nodo</div>
+    <div class="card-body">
+        <form method="post" class="form-grid">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group{% if field.field.widget.input_type == 'textarea' %} full{% endif %}">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                <small class="text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                <div class="field-errors">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <div class="form-group full">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -5,14 +5,14 @@ from django.db.models import Count, Q
 from django.core.paginator import Paginator
 from .models import NodoTramite, Alumno, Carrera, Pension, Beca, Documento
 from .tree_logic.generic_tree import NodoArbol, ArbolGenerico
-from .forms import AlumnoForm, CarreraForm, PensionForm, BecaForm, DocumentoForm
+from .forms import NodoTramiteForm, AlumnoForm, CarreraForm, PensionForm, BecaForm, DocumentoForm
 
 # ============================================================
 # ROL: BACKEND — Vistas y Endpoints
 # ============================================================
 
 def construir_arbol(nodo_db):
-    nodo = NodoArbol(nodo_db.id, nodo_db.nombre, nodo_db.descripcion)
+    nodo = NodoArbol(nodo_db.id, nodo_db.nombre, nodo_db.descripcion, nodo_db.enlace)
     for hijo in nodo_db.hijos.all():
         nodo.hijos.append(construir_arbol(hijo))
     return nodo
@@ -277,6 +277,49 @@ def carrera_nueva(request):
     else:
         form = CarreraForm()
     return render(request, 'tramites/carrera_form.html', {'form': form, 'accion': 'Nueva'})
+
+
+# ------------------------------------------------------------
+# NODOS DEL ÁRBOL (CRUD)
+# ------------------------------------------------------------
+
+def nodo_nuevo(request, padre_id=None):
+    padre = None
+    if padre_id:
+        padre = get_object_or_404(NodoTramite, pk=padre_id)
+    if request.method == 'POST':
+        form = NodoTramiteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Nodo creado correctamente.')
+            return redirect('index')
+    else:
+        initial = {'padre': padre}
+        form = NodoTramiteForm(initial=initial)
+    return render(request, 'tramites/nodo_form.html', {'form': form, 'accion': 'Nuevo'})
+
+def nodo_editar(request, pk):
+    nodo = get_object_or_404(NodoTramite, pk=pk)
+    if request.method == 'POST':
+        form = NodoTramiteForm(request.POST, instance=nodo)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Nodo actualizado correctamente.')
+            return redirect('index')
+    else:
+        form = NodoTramiteForm(instance=nodo)
+    return render(request, 'tramites/nodo_form.html', {'form': form, 'nodo': nodo, 'accion': 'Editar'})
+
+def nodo_eliminar(request, pk):
+    obj = get_object_or_404(NodoTramite, pk=pk)
+    if request.method == 'POST':
+        try:
+            obj.delete()
+            messages.success(request, 'Nodo eliminado.')
+        except Exception as e:
+            messages.error(request, f'No se pudo eliminar: {e}')
+        return redirect('index')
+    return render(request, 'tramites/confirmar_eliminar.html', {'obj': obj})
 
 
 # ------------------------------------------------------------

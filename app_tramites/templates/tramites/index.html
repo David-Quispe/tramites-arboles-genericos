@@ -55,10 +55,13 @@
 <div class="card">
     <div class="card-header">
         🌳 Árbol de Trámites
-        <div class="tree-stats">
-            <span class="badge">Altura: {{ altura }}</span>
-            <span class="badge">Nodos: {{ total_nodos }}</span>
-            <span class="badge">Hojas: {{ total_hojas }}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <div class="tree-stats">
+                <span class="badge">Altura: {{ altura }}</span>
+                <span class="badge">Nodos: {{ total_nodos }}</span>
+                <span class="badge">Hojas: {{ total_hojas }}</span>
+            </div>
+            <a href="{% url 'nodo_nuevo' %}" class="btn btn-sm btn-primary">+ Nodo Raíz</a>
         </div>
     </div>
     <div class="card-body">

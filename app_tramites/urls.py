@@ -5,6 +5,12 @@ urlpatterns = [
     # Dashboard
     path('', views.index, name='index'),
 
+    # Nodos del árbol
+    path('nodos/nuevo/',                    views.nodo_nuevo,   name='nodo_nuevo'),
+    path('nodos/nuevo/<int:padre_id>/',     views.nodo_nuevo,   name='nodo_hijo_nuevo'),
+    path('nodos/<int:pk>/editar/',          views.nodo_editar,  name='nodo_editar'),
+    path('nodos/<int:pk>/eliminar/',        views.nodo_eliminar,name='nodo_eliminar'),
+
     # Alumnos
     path('alumnos/',                views.alumnos_lista,  name='alumnos_lista'),
     path('alumnos/nuevo/',          views.alumno_nuevo,   name='alumno_nuevo'),

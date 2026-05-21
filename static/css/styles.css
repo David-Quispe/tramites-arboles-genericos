@@ -470,6 +470,19 @@ body {
 .children { margin-left:26px; border-left:1.5px dashed var(--border-md); padding-left:14px; }
 .children.collapsed { display: none; }
 .node-label.highlighted { outline: 2px solid var(--primary); outline-offset: 2px; }
+.node-actions { display: none; gap: 2px; margin-left: auto; flex-shrink: 0; }
+.node-row:hover .node-actions { display: flex; }
+.node-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 4px; color: var(--text-muted);
+  text-decoration: none; font-size: 14px; transition: background .15s, color .15s;
+}
+.node-btn:hover { background: var(--border); color: var(--text-main); }
+.node-btn-del:hover { color: #dc2626; background: #fee2e2; }
+.node-link {
+  text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 7px;
+}
+.node-link:hover { text-decoration: underline; }
 .nivel-tag { display:inline-flex; align-items:center; padding:2px 9px; border-radius:20px; font-size:.76rem; font-weight:600; margin:2px; }
 .nivel-tag.nivel-0 { background:#0f172a; color:#e2e8f0; }
 .nivel-tag.nivel-1 { background:#dbeafe; color:#1e3a8a; }

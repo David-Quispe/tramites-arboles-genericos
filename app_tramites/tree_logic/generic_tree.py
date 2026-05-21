@@ -3,10 +3,11 @@
 # ============================================================
 
 class NodoArbol:
-    def __init__(self, id, nombre, descripcion="", hijos=None):
+    def __init__(self, id, nombre, descripcion="", enlace="", hijos=None):
         self.id = id
         self.nombre = nombre
         self.descripcion = descripcion
+        self.enlace = enlace
         self.hijos = hijos or []
 
 
@@ -73,5 +74,6 @@ class ArbolGenerico:
             "id": nodo.id,
             "nombre": nodo.nombre,
             "descripcion": nodo.descripcion,
+            "enlace": nodo.enlace,
             "hijos": [self.a_dict(h) for h in nodo.hijos]
         }

@@ -1,11 +1,8 @@
-// ============================================================
-// ROL: FRONTEND — Renderizado del árbol con collapse/expand
-// ============================================================
-
 function renderTree(nodo, container, nivel) {
   const iconosCls = ['ti-binary-tree', 'ti-folder', 'ti-file-text', 'ti-point'];
   const iconoCls  = iconosCls[Math.min(nivel, iconosCls.length - 1)];
   const tieneHijos = nodo.hijos && nodo.hijos.length > 0;
+  const esHoja = !tieneHijos;
 
   const nodeDiv = document.createElement('div');
   nodeDiv.className = `tree-node nivel-${nivel}`;
@@ -14,7 +11,6 @@ function renderTree(nodo, container, nivel) {
   const row = document.createElement('div');
   row.className = 'node-row';
 
-  // Botón toggle
   const toggle = document.createElement('button');
   toggle.className = 'node-toggle';
   if (tieneHijos) {
@@ -27,16 +23,48 @@ function renderTree(nodo, container, nivel) {
   }
   row.appendChild(toggle);
 
-  // Etiqueta
   const label = document.createElement('span');
   label.className = 'node-label';
-  label.innerHTML = `<i class="ti ${iconoCls}" style="font-size:14px" aria-hidden="true"></i>${nodo.nombre}`;
-  if (nodo.descripcion) label.title = nodo.descripcion;
+  if (nodo.enlace) {
+    const link = document.createElement('a');
+    link.href = nodo.enlace;
+    link.className = 'node-link';
+    link.innerHTML = `<i class="ti ${iconoCls}" style="font-size:14px" aria-hidden="true"></i>${nodo.nombre}`;
+    if (nodo.descripcion) link.title = nodo.descripcion;
+    label.appendChild(link);
+  } else {
+    label.innerHTML = `<i class="ti ${iconoCls}" style="font-size:14px" aria-hidden="true"></i>${nodo.nombre}`;
+    if (nodo.descripcion) label.title = nodo.descripcion;
+  }
   row.appendChild(label);
 
+  const actions = document.createElement('span');
+  actions.className = 'node-actions';
+
+  const addBtn = document.createElement('a');
+  addBtn.href = `/nodos/nuevo/${nodo.id}/`;
+  addBtn.className = 'node-btn';
+  addBtn.title = 'Añadir hijo';
+  addBtn.innerHTML = '<i class="ti ti-plus" aria-hidden="true"></i>';
+  actions.appendChild(addBtn);
+
+  const editBtn = document.createElement('a');
+  editBtn.href = `/nodos/${nodo.id}/editar/`;
+  editBtn.className = 'node-btn';
+  editBtn.title = 'Editar';
+  editBtn.innerHTML = '<i class="ti ti-edit" aria-hidden="true"></i>';
+  actions.appendChild(editBtn);
+
+  const delBtn = document.createElement('a');
+  delBtn.href = `/nodos/${nodo.id}/eliminar/`;
+  delBtn.className = 'node-btn node-btn-del';
+  delBtn.title = 'Eliminar';
+  delBtn.innerHTML = '<i class="ti ti-trash" aria-hidden="true"></i>';
+  actions.appendChild(delBtn);
+
+  row.appendChild(actions);
   nodeDiv.appendChild(row);
 
-  // Hijos
   if (tieneHijos) {
     const childrenDiv = document.createElement('div');
     childrenDiv.className = 'children';
