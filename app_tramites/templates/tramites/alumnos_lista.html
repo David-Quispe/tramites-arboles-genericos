@@ -1,0 +1,50 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}Alumnos{% endblock %}
+{% block nav_alumnos %}active{% endblock %}
+{% block topbar_titulo %}Alumnos{% endblock %}
+{% block topbar_acciones %}
+    <a href="{% url 'alumno_nuevo' %}" class="btn btn-primary">+ Nuevo Alumno</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">🔍 Buscar Alumno</div>
+    <div class="card-body">
+        <form method="get" class="search-form">
+            <input type="text" name="q" value="{{ q }}" placeholder="DNI, nombre o apellido..." class="input-search">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            {% if q %}<a href="{% url 'alumnos_lista' %}" class="btn btn-sm">Limpiar</a>{% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="card mt-1">
+    <div class="card-header">Lista de Alumnos {% if q %}— resultado: "{{ q }}"{% endif %}</div>
+    <div class="card-body p-0">
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th>DNI</th><th>Nombre</th><th>Carrera</th><th>Año</th><th>Ciclo</th><th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in alumnos %}
+                <tr>
+                    <td><strong>{{ a.dni }}</strong></td>
+                    <td>{{ a.nombre_completo }}</td>
+                    <td>{{ a.carrera.nombre }}</td>
+                    <td>{{ a.get_anio_display }}</td>
+                    <td>{{ a.get_ciclo_display }}</td>
+                    <td>
+                        <a href="{% url 'alumno_detalle' a.dni %}" class="btn btn-sm btn-blue">Ver</a>
+                        <a href="{% url 'alumno_editar' a.dni %}" class="btn btn-sm">Editar</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center">No se encontraron alumnos.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

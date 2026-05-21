@@ -1,0 +1,122 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}{{ alumno.nombre_completo }}{% endblock %}
+{% block nav_alumnos %}active{% endblock %}
+{% block topbar_titulo %}Ficha del Alumno{% endblock %}
+{% block topbar_acciones %}
+    <a href="{% url 'alumnos_lista' %}" class="btn btn-sm">← Volver</a>
+    <a href="{% url 'alumno_editar' alumno.dni %}" class="btn btn-primary">Editar</a>
+{% endblock %}
+
+{% block content %}
+
+<!-- Datos del alumno -->
+<div class="card mb-2">
+    <div class="card-header">🎓 {{ alumno.nombre_completo }}</div>
+    <div class="card-body">
+        <div class="info-grid">
+            <div class="info-item"><span class="info-label">DNI</span><span class="info-val">{{ alumno.dni }}</span></div>
+            <div class="info-item"><span class="info-label">Carrera</span><span class="info-val">{{ alumno.carrera.nombre }}</span></div>
+            <div class="info-item"><span class="info-label">Código</span><span class="info-val">{{ alumno.carrera.codigo }}</span></div>
+            <div class="info-item"><span class="info-label">Año</span><span class="info-val">{{ alumno.get_anio_display }}</span></div>
+            <div class="info-item"><span class="info-label">Ciclo</span><span class="info-val">{{ alumno.get_ciclo_display }}</span></div>
+            <div class="info-item"><span class="info-label">Ingreso</span><span class="info-val">{{ alumno.fecha_ingreso }}</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+    <button class="tab-btn active" onclick="showTab('pensiones')">💳 Pensiones ({{ pensiones.count }})</button>
+    <button class="tab-btn" onclick="showTab('becas')">🏅 Becas ({{ becas.count }})</button>
+    <button class="tab-btn" onclick="showTab('documentos')">📄 Documentos ({{ documentos.count }})</button>
+</div>
+
+<!-- Tab Pensiones -->
+<div id="tab-pensiones" class="tab-content active card">
+    <div class="card-header">
+        💳 Pensiones
+        <a href="{% url 'pension_nueva' alumno.dni %}" class="btn btn-sm btn-primary">+ Nueva</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="tabla">
+            <thead><tr><th>Mes</th><th>Año</th><th>Monto</th><th>Estado</th><th>Fecha Pago</th><th>Acciones</th></tr></thead>
+            <tbody>
+                {% for p in pensiones %}
+                <tr>
+                    <td>{{ p.get_mes_display }}</td>
+                    <td>{{ p.anio }}</td>
+                    <td>S/ {{ p.monto }}</td>
+                    <td><span class="badge-estado estado-{{ p.estado }}">{{ p.get_estado_display }}</span></td>
+                    <td>{{ p.fecha_pago|default:"—" }}</td>
+                    <td><a href="{% url 'pension_editar' p.pk %}" class="btn btn-sm">Editar</a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center">Sin pensiones registradas.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Tab Becas -->
+<div id="tab-becas" class="tab-content card" style="display:none">
+    <div class="card-header">
+        🏅 Becas
+        <a href="{% url 'beca_nueva' alumno.dni %}" class="btn btn-sm btn-primary">+ Nueva</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="tabla">
+            <thead><tr><th>Tipo</th><th>Descuento</th><th>Estado</th><th>Inicio</th><th>Fin</th><th>Acciones</th></tr></thead>
+            <tbody>
+                {% for b in becas %}
+                <tr>
+                    <td>{{ b.get_tipo_display }}</td>
+                    <td>{{ b.porcentaje }}%</td>
+                    <td><span class="badge-estado estado-{{ b.estado }}">{{ b.get_estado_display }}</span></td>
+                    <td>{{ b.fecha_inicio }}</td>
+                    <td>{{ b.fecha_fin|default:"Vigente" }}</td>
+                    <td><a href="{% url 'beca_editar' b.pk %}" class="btn btn-sm">Editar</a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center">Sin becas registradas.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Tab Documentos -->
+<div id="tab-documentos" class="tab-content card" style="display:none">
+    <div class="card-header">
+        📄 Documentos
+        <a href="{% url 'documento_nuevo' alumno.dni %}" class="btn btn-sm btn-primary">+ Nueva Solicitud</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="tabla">
+            <thead><tr><th>Tipo</th><th>Estado</th><th>Solicitado</th><th>Entregado</th><th>Acciones</th></tr></thead>
+            <tbody>
+                {% for d in documentos %}
+                <tr>
+                    <td>{{ d.get_tipo_display }}</td>
+                    <td><span class="badge-estado estado-{{ d.estado }}">{{ d.get_estado_display }}</span></td>
+                    <td>{{ d.fecha_solicitud }}</td>
+                    <td>{{ d.fecha_entrega|default:"—" }}</td>
+                    <td><a href="{% url 'documento_editar' d.pk %}" class="btn btn-sm">Editar</a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center">Sin documentos registrados.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function showTab(name) {
+    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).style.display = 'block';
+    event.target.classList.add('active');
+}
+</script>
+{% endblock %}
