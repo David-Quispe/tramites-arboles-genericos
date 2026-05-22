@@ -1,66 +1,79 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RutaTree — {% block titulo %}Sistema de Trámites{% endblock %}</title>
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RutaTree — {% block titulo %}Sistema de Trámites{% endblock %}</title>
+    {% load static %}
+    <!-- Tabler Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tree_extras.css' %}">
 </head>
-<body>TR
+<body>
 
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-brand">
-    <div class="brand-icon">T</div>
-    <div>
-      <div class="brand-name">Tramites Administativos</div>
-      <div class="brand-sub">TECSUP</div>
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon">🌳</div>
+        <div>
+            <div class="brand-name">RutaTree</div>
+            <div class="brand-sub">Instituto Superior</div>
+        </div>
     </div>
-  </div>
-  <nav class="sidebar-nav">
-    <a href="{% url 'index' %}" class="nav-item {% block nav_inicio %}{% endblock %}">
-      <i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard
-    </a>
-    <a href="{% url 'alumnos_lista' %}" class="nav-item {% block nav_alumnos %}{% endblock %}">
-      <i class="ti ti-school" aria-hidden="true"></i> Alumnos
-    </a>
-    <a href="{% url 'carreras_lista' %}" class="nav-item {% block nav_carreras %}{% endblock %}">
-      <i class="ti ti-book-2" aria-hidden="true"></i> Carreras
-    </a>
-    <div class="nav-divider">Trámites</div>
-    <a href="{% url 'api_arbol' %}" class="nav-item" target="_blank">
-      <i class="ti ti-plug" aria-hidden="true"></i> API JSON
-    </a>
-  </nav>
-  <div class="sidebar-footer">
-    Área Administrativa<br>
-    <span style="color:#334155">© 2026 riboy :3</span>
-  </div>
+    <nav class="sidebar-nav">
+        <a href="{% url 'index' %}" class="nav-item {% block nav_inicio %}{% endblock %}">
+            <i class="ti ti-layout-dashboard"></i> Inicio
+        </a>
+        <a href="{% url 'alumnos_lista' %}" class="nav-item {% block nav_alumnos %}{% endblock %}">
+            <i class="ti ti-school"></i> Alumnos
+        </a>
+        <a href="{% url 'carreras_lista' %}" class="nav-item {% block nav_carreras %}{% endblock %}">
+            <i class="ti ti-books"></i> Carreras
+        </a>
+        <a href="{% url 'docentes_lista' %}" class="nav-item {% block nav_docentes %}{% endblock %}">
+            <i class="ti ti-chalkboard"></i> Docentes
+        </a>
+
+        <div class="nav-divider">Finanzas</div>
+        <a href="{% url 'finanzas_dashboard' %}" class="nav-item {% block nav_finanzas %}{% endblock %}">
+            <i class="ti ti-coins"></i> Panel de Finanzas
+        </a>
+        <a href="{% url 'pensiones_vencidas' %}" class="nav-item {% block nav_vencidas %}{% endblock %}">
+            <i class="ti ti-alert-triangle"></i> Pensiones Vencidas
+        </a>
+
+        <div class="nav-divider">Comunicación</div>
+        <a href="{% url 'notificaciones' %}" class="nav-item {% block nav_notif %}{% endblock %}">
+            <i class="ti ti-bell"></i> Notificaciones
+        </a>
+        <a href="{% url 'comunicados_lista' %}" class="nav-item {% block nav_comunicados %}{% endblock %}">
+            <i class="ti ti-speakerphone"></i> Comunicados
+        </a>
+
+        <div class="nav-divider">Árbol</div>
+        <a href="{% url 'api_arbol' %}" class="nav-item" target="_blank">
+            <i class="ti ti-api"></i> API JSON
+        </a>
+    </nav>
+    <div class="sidebar-footer">Sistema Administrativo<br>RutaTree v2.0</div>
 </aside>
 
 <div class="main-wrapper">
-  <header class="topbar">
-    <div class="topbar-title">
-      <i class="ti ti-{% block topbar_icon %}home{% endblock %}" aria-hidden="true"></i>
-      {% block topbar_titulo %}Dashboard{% endblock %}
-    </div>
-    <div class="topbar-actions">
-      {% block topbar_acciones %}{% endblock %}
-    </div>
-  </header>
-
-  <main class="content">
-    {% if messages %}
-      {% for msg in messages %}
-        <div class="alert alert-{{ msg.tags }}">
-          <i class="ti ti-{% if msg.tags == 'success' %}circle-check{% elif msg.tags == 'error' %}circle-x{% else %}info-circle{% endif %}" aria-hidden="true"></i>
-          {{ msg }}
+    <header class="topbar">
+        <div class="topbar-title">
+            {% block topbar_icon %}<i class="ti ti-layout-dashboard"></i>{% endblock %}
+            {% block topbar_titulo %}Dashboard{% endblock %}
         </div>
-      {% endfor %}
-    {% endif %}
-    {% block content %}{% endblock %}
-  </main>
+        <div class="topbar-actions">{% block topbar_acciones %}{% endblock %}</div>
+    </header>
+    <main class="content">
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="alert alert-{% if msg.tags == 'error' %}error{% else %}{{ msg.tags }}{% endif %}">{{ msg }}</div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
 </div>
 
 <script src="{% static 'js/tree_render.js' %}"></script>

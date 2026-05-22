@@ -1,0 +1,83 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}Docentes{% endblock %}
+{% block nav_docentes %}active{% endblock %}
+{% block topbar_icon %}<i class="ti ti-chalkboard"></i>{% endblock %}
+{% block topbar_titulo %}Docentes{% endblock %}
+{% block topbar_acciones %}
+    <a href="{% url 'docente_nuevo' %}" class="btn btn-primary">+ Nuevo Docente</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">🔍 Buscar Docente</div>
+    <div class="card-body">
+        <form method="get" class="search-form">
+            <input type="text" name="q" value="{{ q }}" placeholder="DNI, nombre o apellido..." class="input-search">
+            <select name="especialidad" class="form-control" style="max-width:200px;">
+                <option value="">— Especialidad —</option>
+                {% for val, label in especialidades %}
+                    <option value="{{ val }}" {% if especialidad == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            {% if q or especialidad %}
+                <a href="{% url 'docentes_lista' %}" class="btn btn-sm">Limpiar</a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="card mt-1">
+    <div class="card-header">
+        Lista de Docentes
+        {% if q %}— resultado: "{{ q }}"{% endif %}
+    </div>
+    <div class="card-body p-0">
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th>DNI</th>
+                    <th>Nombre</th>
+                    <th>Especialidad</th>
+                    <th>Correo</th>
+                    <th>Cursos asignados</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in docentes %}
+                <tr>
+                    <td><strong>{{ d.dni }}</strong></td>
+                    <td>{{ d.nombre_completo }}</td>
+                    <td>{{ d.get_especialidad_display }}</td>
+                    <td>{{ d.correo_institucional|default:"—" }}</td>
+                    <td>
+                        <span class="badge">{{ d.total_cursos }}</span>
+                    </td>
+                    <td>
+                        <a href="{% url 'docente_detalle' d.dni %}" class="btn btn-sm btn-blue">Ver</a>
+                        <a href="{% url 'docente_editar' d.dni %}" class="btn btn-sm">Editar</a>
+                        <a href="{% url 'docente_eliminar' d.dni %}" class="btn btn-sm btn-danger">Desactivar</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No se encontraron docentes.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if docentes.paginator.num_pages > 1 %}
+    <div class="card-footer pagination-nav">
+        {% if docentes.has_previous %}
+            <a href="?page={{ docentes.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if especialidad %}&especialidad={{ especialidad }}{% endif %}" class="btn btn-sm">← Anterior</a>
+        {% endif %}
+        <span class="text-sm">Página {{ docentes.number }} de {{ docentes.paginator.num_pages }}</span>
+        {% if docentes.has_next %}
+            <a href="?page={{ docentes.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if especialidad %}&especialidad={{ especialidad }}{% endif %}" class="btn btn-sm">Siguiente →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

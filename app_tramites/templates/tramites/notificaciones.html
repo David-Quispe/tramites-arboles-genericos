@@ -1,0 +1,75 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}Notificaciones{% endblock %}
+{% block topbar_titulo %}Bandeja de Notificaciones{% endblock %}
+{% block topbar_acciones %}
+    {% if no_leidas > 0 %}
+    <a href="{% url 'notificaciones_todas' %}" class="btn btn-secondary">✓ Marcar todas como leídas</a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+{% if no_leidas > 0 %}
+<div class="alert alert-warning">🔔 Tienes <strong>{{ no_leidas }}</strong> notificación{{ no_leidas|pluralize }} sin leer.</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header">🔔 Notificaciones</div>
+    <div class="card-body p-0">
+        {% for n in notificaciones %}
+        <div class="notif-item {% if not n.leida %}notif-unread{% endif %}">
+            <div class="notif-icon tipo-{{ n.tipo }}">
+                {% if n.tipo == 'pago_vencido' %}🔴
+                {% elif n.tipo == 'pago_proximo' %}⏰
+                {% elif n.tipo == 'nota_cargada' %}📝
+                {% elif n.tipo == 'comunicado' %}📢
+                {% elif n.tipo == 'matricula' %}🎓
+                {% else %}🔔{% endif %}
+            </div>
+            <div class="notif-body">
+                <div class="notif-titulo">{{ n.titulo }}</div>
+                <div class="notif-mensaje text-sm text-muted">{{ n.mensaje }}</div>
+                <div class="notif-meta text-sm text-muted">
+                    {% if n.alumno %}{{ n.alumno.nombre_completo }} · {% endif %}
+                    {{ n.fecha|date:"d/m/Y H:i" }}
+                </div>
+            </div>
+            <div class="notif-acciones">
+                {% if not n.leida %}
+                <a href="{% url 'notificacion_leida' n.pk %}" class="btn btn-xs btn-secondary">Leída</a>
+                {% else %}
+                <span class="text-sm text-muted">✓ Leída</span>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <span style="font-size:40px;display:block;margin-bottom:10px">🔕</span>
+            <p>No hay notificaciones.</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% if notificaciones.has_other_pages %}
+    <div class="card-footer">
+        <div class="pagination-nav">
+            {% if notificaciones.has_previous %}<a href="?page={{ notificaciones.previous_page_number }}" class="btn btn-sm btn-secondary">← Anterior</a>{% endif %}
+            <span class="text-sm text-muted">{{ notificaciones.number }} / {{ notificaciones.paginator.num_pages }}</span>
+            {% if notificaciones.has_next %}<a href="?page={{ notificaciones.next_page_number }}" class="btn btn-sm btn-secondary">Siguiente →</a>{% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.notif-item { display:flex; align-items:flex-start; gap:14px; padding:14px 18px; border-bottom:1px solid var(--border); transition:background .15s; }
+.notif-item:last-child { border-bottom:none; }
+.notif-item:hover { background:var(--bg-surface); }
+.notif-unread { background:#eff6ff; }
+.notif-unread:hover { background:#dbeafe; }
+.notif-icon { font-size:1.5rem; flex-shrink:0; margin-top:2px; }
+.notif-body { flex:1; }
+.notif-titulo { font-weight:600; font-size:.9rem; margin-bottom:3px; }
+.notif-mensaje { margin-bottom:4px; }
+.notif-acciones { flex-shrink:0; }
+</style>
+{% endblock %}

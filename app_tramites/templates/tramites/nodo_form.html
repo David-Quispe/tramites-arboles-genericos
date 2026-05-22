@@ -1,31 +1,77 @@
 {% extends 'tramites/base.html' %}
 {% block titulo %}{{ accion }} Nodo{% endblock %}
 {% block nav_inicio %}active{% endblock %}
+{% block topbar_icon %}<i class="ti ti-binary-tree"></i>{% endblock %}
 {% block topbar_titulo %}{{ accion }} Nodo del Árbol{% endblock %}
 {% block topbar_acciones %}
     <a href="{% url 'index' %}" class="btn btn-sm">← Volver al Árbol</a>
 {% endblock %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header">{{ accion }} Nodo</div>
+<div class="card" style="max-width:640px; margin:0 auto;">
+    <div class="card-header">
+        {% if nodo %}
+            <div class="card-header-left"><i class="ti ti-edit"></i> Editando: <strong>{{ nodo.nombre }}</strong></div>
+        {% else %}
+            <div class="card-header-left"><i class="ti ti-plus"></i> Nuevo Nodo</div>
+        {% endif %}
+    </div>
     <div class="card-body">
-        <form method="post" class="form-grid">
+        <form method="post">
             {% csrf_token %}
-            {% for field in form %}
-            <div class="form-group{% if field.field.widget.input_type == 'textarea' %} full{% endif %}">
-                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-                {% if field.help_text %}
-                <small class="text-muted">{{ field.help_text }}</small>
-                {% endif %}
-                {% if field.errors %}
-                <div class="field-errors">{{ field.errors }}</div>
-                {% endif %}
+
+            <div class="form-grid-2">
+
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label class="form-label">Nombre del nodo *</label>
+                    {{ form.nombre }}
+                    {% if form.nombre.errors %}<small class="text-danger">{{ form.nombre.errors|join:", " }}</small>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tipo de nodo *</label>
+                    {{ form.tipo }}
+                    <small style="color:var(--text-muted); font-size:.78rem;">
+                        Categoría → agrupa trámites. Trámite → proceso. Documento → archivo. Acción → paso final.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nodo padre</label>
+                    {{ form.padre }}
+                    <small style="color:var(--text-muted); font-size:.78rem;">Deja vacío solo si es la raíz del árbol.</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Orden (posición entre hermanos)</label>
+                    {{ form.orden }}
+                    <small style="color:var(--text-muted); font-size:.78rem;">Número menor = aparece primero.</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Enlace / URL (opcional)</label>
+                    {{ form.enlace }}
+                    <small style="color:var(--text-muted); font-size:.78rem;">Ej: /alumnos/ o https://...</small>
+                </div>
+
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label class="form-label">Descripción</label>
+                    {{ form.descripcion }}
+                </div>
+
             </div>
-            {% endfor %}
-            <div class="form-group full">
-                <button type="submit" class="btn btn-primary">Guardar</button>
+
+            <div style="margin-top:1.5rem; display:flex; gap:.75rem; flex-wrap:wrap;">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ti ti-device-floppy"></i>
+                    {% if nodo %}Guardar cambios{% else %}Crear nodo{% endif %}
+                </button>
+                {% if nodo %}
+                    <a href="{% url 'nodo_eliminar' nodo.pk %}" class="btn btn-danger">
+                        <i class="ti ti-trash"></i> Eliminar
+                    </a>
+                {% endif %}
+                <a href="{% url 'index' %}" class="btn btn-sm">Cancelar</a>
             </div>
         </form>
     </div>

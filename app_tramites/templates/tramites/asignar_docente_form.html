@@ -1,0 +1,41 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}Asignar Docente{% endblock %}
+{% block nav_docentes %}active{% endblock %}
+{% block topbar_icon %}<i class="ti ti-user-check"></i>{% endblock %}
+{% block topbar_titulo %}Asignar Docente a Curso{% endblock %}
+{% block topbar_acciones %}
+    <a href="{% url 'carrera_detalle' carrera.codigo %}" class="btn btn-sm">← Volver a Carrera</a>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:560px; margin:0 auto;">
+    <div class="card-header">👨‍🏫 Asignación de Docente</div>
+    <div class="card-body">
+
+        <!-- Información del curso -->
+        <div style="background:var(--bg-secondary); border-radius:8px; padding:1rem; margin-bottom:1.25rem; border-left:4px solid var(--primary);">
+            <div style="font-size:.8rem; color:var(--text-muted); margin-bottom:.25rem;">Curso</div>
+            <div style="font-weight:600; font-size:1rem;">{{ cc.curso.nombre }}</div>
+            <div style="font-size:.85rem; color:var(--text-muted); margin-top:.4rem;">
+                <span class="badge">Ciclo {{ cc.ciclo }}</span>
+                &nbsp;·&nbsp;
+                <i class="ti ti-books"></i> {{ carrera.nombre }}
+                &nbsp;·&nbsp;
+                Código: <code>{{ cc.curso.codigo }}</code>
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Seleccionar Docente</label>
+                {{ form.docente }}
+            </div>
+            <div style="margin-top:1.25rem; display:flex; gap:.75rem;">
+                <button type="submit" class="btn btn-primary">Guardar asignación</button>
+                <a href="{% url 'carrera_detalle' carrera.codigo %}" class="btn btn-sm">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

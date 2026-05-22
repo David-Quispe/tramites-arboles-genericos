@@ -1,0 +1,151 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}Finanzas — {{ alumno.nombre_completo }}{% endblock %}
+{% block topbar_titulo %}Finanzas del Alumno{% endblock %}
+{% block topbar_acciones %}
+    <a href="{% url 'finanzas_dashboard' %}" class="btn btn-secondary">← Finanzas</a>
+    <a href="{% url 'alumno_detalle' alumno.dni %}" class="btn btn-secondary">Ver Ficha</a>
+    <a href="{% url 'pago_nuevo' alumno.dni %}" class="btn btn-primary">+ Registrar Pago</a>
+{% endblock %}
+
+{% block content %}
+
+<!-- Datos alumno -->
+<div class="card mb-2">
+    <div class="alumno-header">
+        <div class="alumno-avatar">{{ alumno.nombre|first }}{{ alumno.apellido|first }}</div>
+        <div class="alumno-meta">
+            <h2>{{ alumno.nombre_completo }}</h2>
+            <p>DNI {{ alumno.dni }} · {{ alumno.carrera.nombre }} · {{ alumno.get_ciclo_display }}</p>
+            {% if alumno.correo_institucional %}
+            <p class="text-sm text-muted">✉️ {{ alumno.correo_institucional }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Resumen financiero -->
+<div class="stats-grid mb-2">
+    <div class="stat-card stat-blue">
+        <div class="stat-icon">📋</div>
+        <div class="stat-info">
+            <div class="stat-num">S/ {{ total_pensiones }}</div>
+            <div class="stat-label">Total Pensiones</div>
+        </div>
+    </div>
+    <div class="stat-card stat-green">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+            <div class="stat-num">S/ {{ total_pagado }}</div>
+            <div class="stat-label">Total Pagado</div>
+        </div>
+    </div>
+    <div class="stat-card stat-yellow">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-info">
+            <div class="stat-num">S/ {{ total_pendiente }}</div>
+            <div class="stat-label">Pendiente</div>
+        </div>
+    </div>
+    <div class="stat-card {% if saldo > 0 %}stat-red{% else %}stat-green{% endif %}">
+        <div class="stat-icon">⚖️</div>
+        <div class="stat-info">
+            <div class="stat-num">S/ {{ saldo }}</div>
+            <div class="stat-label">Saldo</div>
+        </div>
+    </div>
+</div>
+
+<!-- Becas activas -->
+{% if becas %}
+<div class="card mb-2">
+    <div class="card-header">🏅 Becas Activas</div>
+    <div class="card-body">
+        <div class="progress-chips">
+            {% for b in becas %}
+            <span class="chip chip-green">{{ b.get_tipo_display }} — {{ b.porcentaje }}% descuento</span>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Tabs -->
+<div class="tabs">
+    <button class="tab-btn active" onclick="showTab('pensiones', this)">💳 Pensiones ({{ pensiones.count }})</button>
+    <button class="tab-btn" onclick="showTab('pagos', this)">🧾 Pagos ({{ pagos.count }})</button>
+</div>
+
+<!-- Tab Pensiones -->
+<div id="tab-pensiones" class="tab-content active card">
+    <div class="card-header">
+        💳 Estado de Pensiones
+        <a href="{% url 'pension_nueva' alumno.dni %}" class="btn btn-sm btn-primary">+ Nueva</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="tabla">
+            <thead><tr><th>Mes / Año</th><th>Monto</th><th>Estado</th><th>Fecha Pago</th><th>Acciones</th></tr></thead>
+            <tbody>
+                {% for p in pensiones %}
+                <tr>
+                    <td>{{ p.get_mes_display }} {{ p.anio }}</td>
+                    <td><strong>S/ {{ p.monto }}</strong></td>
+                    <td><span class="badge-estado estado-{{ p.estado }}">{{ p.get_estado_display }}</span></td>
+                    <td>{{ p.fecha_pago|default:"—" }}</td>
+                    <td>
+                        <a href="{% url 'pension_editar' p.pk %}" class="btn btn-xs">Editar</a>
+                        {% if p.estado != 'pagado' %}
+                        <a href="{% url 'pago_nuevo' alumno.dni %}?pension={{ p.pk }}" class="btn btn-xs btn-primary">Pagar</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center">Sin pensiones registradas.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Tab Pagos -->
+<div id="tab-pagos" class="tab-content card" style="display:none">
+    <div class="card-header">
+        🧾 Historial de Pagos
+        <a href="{% url 'pago_nuevo' alumno.dni %}" class="btn btn-sm btn-primary">+ Nuevo Pago</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="tabla">
+            <thead><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th>Monto</th><th>Método</th><th>Estado</th><th>N° Op.</th><th>Acciones</th></tr></thead>
+            <tbody>
+                {% for p in pagos %}
+                <tr>
+                    <td class="text-sm">{{ p.fecha }}</td>
+                    <td>{{ p.get_tipo_display }}</td>
+                    <td class="text-sm">{{ p.concepto }}</td>
+                    <td><strong>S/ {{ p.monto }}</strong></td>
+                    <td class="text-sm">{{ p.get_metodo_display }}</td>
+                    <td><span class="badge-estado estado-{{ p.estado }}">{{ p.get_estado_display }}</span></td>
+                    <td class="mono text-sm">{{ p.num_operacion|default:"—" }}</td>
+                    <td>
+                        <a href="{% url 'pago_editar' p.pk %}" class="btn btn-xs">Editar</a>
+                        {% if p.estado == 'completado' %}
+                        <a href="{% url 'pago_anular' p.pk %}" class="btn btn-xs btn-danger">Anular</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="text-center">Sin pagos registrados.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function showTab(name, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).style.display = 'block';
+    btn.classList.add('active');
+}
+</script>
+{% endblock %}

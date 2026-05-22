@@ -1,0 +1,130 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}Finanzas{% endblock %}
+{% block topbar_titulo %}Panel de Finanzas{% endblock %}
+{% block topbar_acciones %}
+    <a href="{% url 'pensiones_vencidas' %}" class="btn btn-secondary">⚠️ Vencidas</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="stats-grid">
+    <div class="stat-card stat-green">
+        <div class="stat-icon">💰</div>
+        <div class="stat-info">
+            <div class="stat-num">S/ {{ total_cobrado }}</div>
+            <div class="stat-label">Total Cobrado</div>
+        </div>
+    </div>
+    <div class="stat-card stat-yellow">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-info">
+            <div class="stat-num">S/ {{ total_pendiente }}</div>
+            <div class="stat-label">Pensiones Pendientes</div>
+        </div>
+    </div>
+    <div class="stat-card stat-red">
+        <div class="stat-icon">🔴</div>
+        <div class="stat-info">
+            <div class="stat-num">S/ {{ total_vencido }}</div>
+            <div class="stat-label">Pensiones Vencidas</div>
+        </div>
+    </div>
+    <div class="stat-card stat-blue">
+        <div class="stat-icon">🧾</div>
+        <div class="stat-info">
+            <div class="stat-num">{{ total_pagos }}</div>
+            <div class="stat-label">Pagos Completados</div>
+        </div>
+    </div>
+</div>
+
+<div class="layout-2col">
+
+    <!-- Últimos pagos -->
+    <div class="card">
+        <div class="card-header">🧾 Últimos Pagos</div>
+        <div class="card-body p-0">
+            <table class="tabla">
+                <thead><tr><th>Alumno</th><th>Tipo</th><th>Monto</th><th>Método</th><th>Fecha</th></tr></thead>
+                <tbody>
+                    {% for p in ultimos_pagos %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'finanzas_alumno' p.alumno.dni %}" class="text-link">
+                                {{ p.alumno.nombre_completo }}
+                            </a>
+                            <div class="text-sm text-muted mono">{{ p.alumno.dni }}</div>
+                        </td>
+                        <td>{{ p.get_tipo_display }}</td>
+                        <td><strong>S/ {{ p.monto }}</strong></td>
+                        <td>{{ p.get_metodo_display }}</td>
+                        <td class="text-sm">{{ p.fecha }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center">Sin pagos registrados.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pensiones por vencer -->
+    <div class="card">
+        <div class="card-header">
+            ⚠️ Pensiones Pendientes / Vencidas
+            <a href="{% url 'pensiones_vencidas' %}" class="btn btn-sm">Ver todas</a>
+        </div>
+        <div class="card-body p-0">
+            <table class="tabla">
+                <thead><tr><th>Alumno</th><th>Mes</th><th>Monto</th><th>Estado</th></tr></thead>
+                <tbody>
+                    {% for p in vencidas %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'finanzas_alumno' p.alumno.dni %}" class="text-link">
+                                {{ p.alumno.apellido }}, {{ p.alumno.nombre }}
+                            </a>
+                        </td>
+                        <td class="text-sm">{{ p.get_mes_display }} {{ p.anio }}</td>
+                        <td>S/ {{ p.monto }}</td>
+                        <td><span class="badge-estado estado-{{ p.estado }}">{{ p.get_estado_display }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center">Sin pendientes 🎉</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Pagos por método -->
+{% if por_metodo %}
+<div class="card mt-1">
+    <div class="card-header">📊 Recaudación por Método de Pago</div>
+    <div class="card-body">
+        <div class="metodo-grid">
+            {% for m in por_metodo %}
+            <div class="metodo-card">
+                <div class="metodo-nombre">{{ m.metodo|title }}</div>
+                <div class="metodo-monto">S/ {{ m.total }}</div>
+                <div class="text-sm text-muted">{{ m.cantidad }} pago{{ m.cantidad|pluralize }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.layout-2col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+@media(max-width:768px){ .layout-2col { grid-template-columns:1fr; } }
+.text-link { color:var(--primary); text-decoration:none; font-weight:500; }
+.text-link:hover { text-decoration:underline; }
+.metodo-grid { display:flex; gap:12px; flex-wrap:wrap; }
+.metodo-card { background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px 18px; min-width:140px; }
+.metodo-nombre { font-size:.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+.metodo-monto { font-size:1.3rem; font-weight:700; color:var(--primary); margin:4px 0 2px; }
+</style>
+{% endblock %}

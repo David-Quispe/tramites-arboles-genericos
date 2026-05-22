@@ -1,0 +1,85 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}Eliminar Nodo{% endblock %}
+{% block topbar_icon %}trash{% endblock %}
+{% block topbar_titulo %}Eliminar Nodo{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="{% url 'index' %}">Dashboard</a>
+  <span class="breadcrumb-sep"><i class="ti ti-chevron-right"></i></span>
+  <span>Eliminar nodo</span>
+</div>
+
+<div class="card" style="max-width:520px">
+  <div class="card-header">
+    <div class="card-header-left">
+      <i class="ti ti-trash" style="color:#dc2626"></i>
+      Eliminar: <strong>{{ nodo.nombre }}</strong>
+    </div>
+  </div>
+  <div class="card-body">
+
+    {% if num_hijos > 0 %}
+    <div class="alert alert-warning">
+      <i class="ti ti-alert-triangle"></i>
+      Este nodo tiene <strong>{{ num_hijos }}</strong> hijo(s) directo(s)
+      y <strong>{{ num_desc }}</strong> descendiente(s) en total.
+      Elige cómo manejarlos:
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="elim-opciones">
+        <label class="elim-opcion">
+          <input type="radio" name="modo" value="subarbol" checked>
+          <div>
+            <div class="elim-opcion-title">🗑️ Eliminar todo el subárbol</div>
+            <div class="elim-opcion-desc">
+              Se elimina "{{ nodo.nombre }}" junto con sus {{ num_desc }} descendiente(s).
+              Esta acción no se puede deshacer.
+            </div>
+          </div>
+        </label>
+        <label class="elim-opcion">
+          <input type="radio" name="modo" value="reasignar">
+          <div>
+            <div class="elim-opcion-title">🔁 Reasignar hijos al padre</div>
+            <div class="elim-opcion-desc">
+              Los {{ num_hijos }} hijo(s) directo(s) pasarán a ser hijos de
+              <strong>{{ nodo.padre.nombre }}</strong>. Solo se elimina este nodo.
+            </div>
+          </div>
+        </label>
+      </div>
+      <div class="form-actions">
+        <a href="{% url 'index' %}" class="btn btn-secondary">
+          <i class="ti ti-x"></i> Cancelar
+        </a>
+        <button type="submit" class="btn btn-danger">
+          <i class="ti ti-trash"></i> Confirmar eliminación
+        </button>
+      </div>
+    </form>
+
+    {% else %}
+    <div class="alert alert-info">
+      <i class="ti ti-info-circle"></i>
+      "{{ nodo.nombre }}" es un nodo hoja (sin hijos). Se eliminará directamente.
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="modo" value="subarbol">
+      <div class="form-actions">
+        <a href="{% url 'index' %}" class="btn btn-secondary">
+          <i class="ti ti-x"></i> Cancelar
+        </a>
+        <button type="submit" class="btn btn-danger">
+          <i class="ti ti-trash"></i> Eliminar nodo
+        </button>
+      </div>
+    </form>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

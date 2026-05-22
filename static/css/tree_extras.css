@@ -1,0 +1,317 @@
+/* ── NUEVOS: nivel badge, tipo badge, panel info, modal mover ── */
+
+/* Nivel badge (N0, N1, N2...) */
+.nivel-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: .65rem;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .04em;
+  border: 1px solid;
+  flex-shrink: 0;
+  cursor: help;
+}
+.nivel-0 > .node-row > .nivel-badge { background:#1e293b; color:#94a3b8; border-color:#334155; }
+.nivel-1 > .node-row > .nivel-badge { background:#dbeafe; color:#1e3a8a; border-color:#bfdbfe; }
+.nivel-2 > .node-row > .nivel-badge { background:#f0fdf4; color:#166534; border-color:#bbf7d0; }
+.nivel-3 > .node-row > .nivel-badge { background:#fef3c7; color:#92400e; border-color:#fde68a; }
+
+/* Tipo badge */
+.tipo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: .68rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.tipo-badge i { font-size: 12px; }
+.tipo-badge.badge-xs { font-size: .63rem; padding: 1px 6px; }
+.tipo-categoria { background: #e0e7ff; color: #3730a3; }
+.tipo-tramite   { background: #d1fae5; color: #065f46; }
+.tipo-documento { background: #fef3c7; color: #92400e; }
+.tipo-accion    { background: #ede9fe; color: #4c1d95; }
+
+/* Selección de nodo */
+.tree-node.selected > .node-row > .node-label {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Acciones inline en nodo (flechas arriba/abajo) */
+.node-acciones {
+  display: none;
+  gap: 2px;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+.node-row:hover .node-acciones { display: flex; }
+.btn-nodo-accion {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  border: 1px solid var(--border-md);
+  border-radius: 4px;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  padding: 0;
+}
+.btn-nodo-accion:hover { background: var(--primary-light); color: var(--primary); border-color: #bfdbfe; }
+
+/* ══ PANEL DE INFORMACIÓN DEL NODO ══ */
+#nodeInfoPanel {
+  display: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-top: 16px;
+  box-shadow: var(--shadow-md);
+}
+.info-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .875rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .82rem;
+  margin-bottom: 14px;
+}
+.info-table .ik {
+  color: var(--text-muted);
+  font-size: .7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding: 6px 10px 6px 0;
+  width: 120px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.info-table .iv {
+  padding: 6px 0;
+  font-weight: 500;
+  color: var(--text-main);
+  vertical-align: middle;
+}
+.info-panel-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+/* ══ RUTA DE BÚSQUEDA ══ */
+#rutaOutput {
+  display: none;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-top: 10px;
+  font-size: .82rem;
+  line-height: 1.8;
+  font-family: 'DM Mono', monospace;
+}
+.ruta-label {
+  font-size: .72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+.ruta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  font-size: .82rem;
+  color: var(--text-main);
+}
+
+/* ══ MODAL MOVER NODO ══ */
+#moverModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.45);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+.modal-box {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.2);
+  border: 1px solid var(--border);
+}
+.modal-title {
+  font-size: .95rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal-title i { font-size: 18px; color: var(--primary); }
+.modal-label {
+  font-size: .75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: block;
+}
+.modal-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: .875rem;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  margin-bottom: 14px;
+}
+.modal-select:focus { outline: none; border-color: var(--primary); }
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.mover-msg {
+  font-size: .8rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+  display: none;
+}
+.mover-msg:not(:empty) { display: block; }
+.mover-msg.ok    { background: #d1fae5; color: #065f46; }
+.mover-msg.error { background: #fee2e2; color: #991b1b; }
+
+/* ══ NODO ELIMINAR (página de confirmación) ══ */
+.elim-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+.elim-opcion {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  background: var(--bg-surface);
+}
+.elim-opcion:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+.elim-opcion input[type="radio"] { margin-top: 2px; flex-shrink: 0; }
+.elim-opcion-title { font-weight: 600; font-size: .875rem; margin-bottom: 2px; }
+.elim-opcion-desc  { font-size: .78rem; color: var(--text-muted); }
+
+/* --- Animaciones y Resaltados del Simulador y Búsqueda --- */
+.node-label {
+  transition: all 0.2s ease;
+}
+.node-label.highlight-visit {
+  background-color: var(--primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+  transform: scale(1.04);
+  font-weight: 600;
+}
+.node-label.highlight-path {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+  outline: 2px solid #f59e0b !important;
+  outline-offset: 2px;
+  font-weight: 600;
+}
+.code-line {
+  padding: 2px 6px;
+  border-left: 3px solid transparent;
+  display: block;
+  white-space: pre;
+}
+.code-line.active {
+  background-color: #eff6ff !important;
+  border-left-color: var(--primary) !important;
+  color: #1e40af !important;
+  font-weight: 600;
+}
+.sim-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: .7rem;
+  font-weight: 600;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  animation: popIn 0.2s ease-out;
+}
+.sim-badge.active-item {
+  border-color: var(--primary);
+  background: #eff6ff;
+  color: var(--primary);
+}
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Badge de estadísticas de trámites (Post-orden) */
+.tramites-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: .65rem;
+  font-weight: 700;
+  border-radius: 10px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  margin-left: 6px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}

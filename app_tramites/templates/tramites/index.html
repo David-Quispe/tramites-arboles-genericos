@@ -14,28 +14,28 @@
 
 <div class="stats-grid">
   <div class="stat-card stat-blue">
-    <div class="stat-icon"><i class="ti ti-school" aria-hidden="true"></i></div>
+    <div class="stat-icon"><i class="ti ti-school"></i></div>
     <div class="stat-info">
       <div class="stat-num">{{ total_alumnos }}</div>
       <div class="stat-label">Alumnos Activos</div>
     </div>
   </div>
   <div class="stat-card stat-red">
-    <div class="stat-icon"><i class="ti ti-credit-card" aria-hidden="true"></i></div>
+    <div class="stat-icon"><i class="ti ti-credit-card"></i></div>
     <div class="stat-info">
       <div class="stat-num">{{ total_pendientes }}</div>
       <div class="stat-label">Pensiones Pendientes</div>
     </div>
   </div>
   <div class="stat-card stat-green">
-    <div class="stat-icon"><i class="ti ti-award" aria-hidden="true"></i></div>
+    <div class="stat-icon"><i class="ti ti-award"></i></div>
     <div class="stat-info">
       <div class="stat-num">{{ total_becas }}</div>
       <div class="stat-label">Becas Vigentes</div>
     </div>
   </div>
   <div class="stat-card stat-yellow">
-    <div class="stat-icon"><i class="ti ti-file-text" aria-hidden="true"></i></div>
+    <div class="stat-icon"><i class="ti ti-file-text"></i></div>
     <div class="stat-info">
       <div class="stat-num">{{ total_docs }}</div>
       <div class="stat-label">Documentos en Proceso</div>
@@ -46,8 +46,7 @@
 <div class="card mb-2">
   <div class="card-header">
     <div class="card-header-left">
-      <i class="ti ti-search" aria-hidden="true"></i>
-      Búsqueda Rápida de Alumno
+      <i class="ti ti-search"></i> Búsqueda Rápida de Alumno
     </div>
   </div>
   <div class="card-body">
@@ -65,86 +64,160 @@
       </select>
       <select name="ciclo" class="filter-select">
         <option value="">Todos los ciclos</option>
-        <option value="1">Ciclo I</option>
-        <option value="2">Ciclo II</option>
-        <option value="3">Ciclo III</option>
-        <option value="4">Ciclo IV</option>
-        <option value="5">Ciclo V</option>
-        <option value="6">Ciclo VI</option>
+        <option value="1">Ciclo I</option><option value="2">Ciclo II</option>
+        <option value="3">Ciclo III</option><option value="4">Ciclo IV</option>
+        <option value="5">Ciclo V</option><option value="6">Ciclo VI</option>
       </select>
-      <button type="submit" class="btn btn-primary">
-        <i class="ti ti-search" aria-hidden="true"></i> Buscar
-      </button>
+      <button type="submit" class="btn btn-primary"><i class="ti ti-search"></i> Buscar</button>
     </form>
   </div>
 </div>
 
-<div class="card">
-  <div class="card-header">
-    <div class="card-header-left">
-      <i class="ti ti-binary-tree" aria-hidden="true"></i>
-      Árbol de Trámites
-      <div class="tree-stats">
+<div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap;">
+
+  <!-- ══ ÁRBOL (70%) ══════════════════════════════════════════ -->
+  <div class="card" style="flex:7; min-width:450px;">
+    <div class="card-header">
+      <div class="card-header-left">
+        <i class="ti ti-binary-tree"></i>
+        Árbol de Trámites
         <span class="badge">Altura: {{ altura }}</span>
         <span class="badge">Nodos: {{ total_nodos }}</span>
         <span class="badge">Hojas: {{ total_hojas }}</span>
       </div>
+      <div style="display:flex; gap:6px; align-items:center;">
+        <a href="{% url 'nodo_nuevo' %}" class="btn btn-primary btn-sm">
+          <i class="ti ti-plus"></i> Nuevo nodo raíz
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Barra de búsqueda del árbol -->
+      <div style="margin-bottom:12px; display:flex; gap:8px; align-items:center;">
+        <input type="text" id="searchInput" placeholder="Buscar nodo en el árbol..." class="input-sm" style="flex:1;">
+        <button onclick="buscarNodo()" class="btn btn-secondary btn-sm">
+          <i class="ti ti-search"></i> Buscar
+        </button>
+        <span id="searchResult"></span>
+      </div>
+
+      <!-- Árbol -->
+      <div id="tree" style="min-height:400px; padding:12px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--bg-surface);"></div>
+
+      <!-- Ruta de búsqueda -->
+      <div id="rutaOutput" style="display:none; margin-top:10px;"></div>
     </div>
   </div>
-  <div class="card-body">
-    <div class="tree-toolbar">
-      <button onclick="verRecorrido('dfs')" class="btn btn-secondary btn-sm">
-        <i class="ti ti-arrows-down" aria-hidden="true"></i> DFS
-      </button>
-      <button onclick="verRecorrido('bfs')" class="btn btn-secondary btn-sm">
-        <i class="ti ti-arrows-right" aria-hidden="true"></i> BFS
-      </button>
-      <input type="text" id="searchInput" placeholder="Buscar nodo..." class="input-sm">
-      <button onclick="buscarNodo()" class="btn btn-secondary btn-sm">
-        <i class="ti ti-search" aria-hidden="true"></i> Buscar
-      </button>
-      <span id="searchResult"></span>
+
+  <!-- ══ PANEL DERECHO (30%) ══════════════════════════════════ -->
+  <div style="flex:3; min-width:280px; display:flex; flex-direction:column; gap:14px;">
+
+    <!-- Panel de info del nodo seleccionado -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left"><i class="ti ti-info-circle"></i> Nodo Seleccionado</div>
+      </div>
+      <div class="card-body" id="nodeInfoPanel">
+        <div style="text-align:center; color:var(--text-muted); font-size:.82rem; font-style:italic; padding:20px 0;">
+          Haz clic en un nodo del árbol para ver su información y opciones.
+        </div>
+      </div>
     </div>
-    <div id="recorridoOutput" class="recorrido-list" style="display:none"></div>
-    <div id="tree"></div>
+
+    <!-- Categorías raíz -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left"><i class="ti ti-folder"></i> Categorías</div>
+        <a href="{% url 'nodo_nuevo' %}" class="btn btn-primary btn-sm">
+          <i class="ti ti-plus"></i> Nueva
+        </a>
+      </div>
+      <div class="card-body p-0">
+        <div id="categorias-panel">
+          <div style="padding:1rem; color:var(--text-muted); font-size:.82rem; font-style:italic;">
+            Cargando categorías...
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL MOVER NODO -->
+<div id="moverModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-title"><i class="ti ti-arrows-move"></i> Mover Subárbol</div>
+    <div id="moverMsg" class="mover-msg"></div>
+    <form onsubmit="event.preventDefault(); confirmarMoverNodo();">
+      <input type="hidden" id="moverNodoId">
+      <p style="font-size:.82rem; color:var(--text-main); margin-bottom:12px;">
+        Mover el subárbol de <strong id="moverNombreNodo" style="color:var(--primary);"></strong> a:
+      </p>
+      <label class="modal-label" for="moverNuevoPadre">Nuevo padre</label>
+      <select id="moverNuevoPadre" class="modal-select"></select>
+      <div class="modal-actions">
+        <button type="button" onclick="cerrarMoverModal()" class="btn btn-secondary btn-sm">Cancelar</button>
+        <button type="submit" class="btn btn-primary btn-sm">Mover</button>
+      </div>
+    </form>
   </div>
 </div>
 
 <script>
   const ARBOL_DATA = {{ arbol_json|safe }};
-  document.addEventListener('DOMContentLoaded', () =>
-    renderTree(ARBOL_DATA, document.getElementById('tree'), 0)
-  );
 
-  function buscarNodo() {
-    const q = document.getElementById('searchInput').value.trim();
-    if (!q) return;
-    fetch(`/api/buscar/?q=${encodeURIComponent(q)}`)
-      .then(r => r.json())
-      .then(data => {
-        const el = document.getElementById('searchResult');
-        if (data.encontrado) {
-          el.className = 'found';
-          el.textContent = `✓ ${data.nombre} (ID: ${data.id})`;
-          highlightNode(data.id);
-        } else {
-          el.className = 'notfound';
-          el.textContent = '✗ No encontrado';
-        }
-      });
-  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const treeEl = document.getElementById('tree');
+    if (treeEl && ARBOL_DATA) {
+      renderTree(ARBOL_DATA, treeEl, 0);
+    }
+    cargarCategorias();
+  });
 
-  function verRecorrido(tipo) {
-    fetch(`/api/recorrido/?tipo=${tipo}`)
-      .then(r => r.json())
-      .then(data => {
-        const out = document.getElementById('recorridoOutput');
-        out.style.display = 'block';
-        out.innerHTML = `<strong>${data.tipo}:</strong> ` +
-          data.recorrido.map(n =>
-            `<span class="nivel-tag nivel-${n.nivel}">${n.nombre}</span>`
-          ).join(' → ');
-      });
+  // ── Cargar categorías desde el árbol ──────────────────────────
+  function cargarCategorias() {
+    const panel = document.getElementById('categorias-panel');
+    if (!ARBOL_DATA) {
+      panel.innerHTML = '<div style="padding:1rem; color:var(--text-muted); font-size:.82rem;">No hay árbol de trámites aún.</div>';
+      return;
+    }
+
+    // Categorías = hijos directos de la raíz (nivel 1) con tipo 'categoria'
+    const categorias = ARBOL_DATA.hijos || [];
+    if (categorias.length === 0) {
+      panel.innerHTML = `
+        <div style="padding:1rem; text-align:center; color:var(--text-muted); font-size:.82rem;">
+          No hay categorías aún.<br>
+          <a href="/nodos/nuevo/${ARBOL_DATA.id}/" class="btn btn-primary btn-sm" style="margin-top:.5rem;">
+            <i class="ti ti-plus"></i> Agregar categoría
+          </a>
+        </div>`;
+      return;
+    }
+
+    panel.innerHTML = categorias.map(cat => `
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:.6rem 1rem; border-bottom:1px solid var(--border-color);">
+        <div style="display:flex; align-items:center; gap:.5rem; font-size:.88rem; font-weight:500;">
+          <i class="ti ti-folder" style="color:var(--primary);"></i>
+          <span>${cat.nombre}</span>
+          ${cat.hijos && cat.hijos.length > 0 ? `<span class="badge" style="font-size:.7rem;">${cat.hijos.length} sub</span>` : ''}
+        </div>
+        <div style="display:flex; gap:4px;">
+          <a href="/nodos/${cat.id}/editar/" class="btn btn-sm" title="Editar categoría"><i class="ti ti-edit"></i></a>
+          <a href="/nodos/nuevo/${cat.id}/" class="btn btn-primary btn-sm" title="Agregar hijo"><i class="ti ti-plus"></i></a>
+          <a href="/nodos/${cat.id}/eliminar/" class="btn btn-danger btn-sm" title="Eliminar"><i class="ti ti-trash"></i></a>
+        </div>
+      </div>
+    `).join('');
+
+    // Botón agregar nueva categoría al final
+    panel.innerHTML += `
+      <div style="padding:.6rem 1rem;">
+        <a href="/nodos/nuevo/${ARBOL_DATA.id}/" class="btn btn-primary btn-sm" style="width:100%; text-align:center;">
+          <i class="ti ti-plus"></i> Agregar categoría
+        </a>
+      </div>`;
   }
 </script>
 {% endblock %}

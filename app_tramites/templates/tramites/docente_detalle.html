@@ -1,0 +1,116 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}Docente — {{ docente.nombre_completo }}{% endblock %}
+{% block nav_docentes %}active{% endblock %}
+{% block topbar_icon %}<i class="ti ti-chalkboard"></i>{% endblock %}
+{% block topbar_titulo %}Perfil de Docente{% endblock %}
+{% block topbar_acciones %}
+    <a href="{% url 'docente_editar' docente.dni %}" class="btn btn-primary">Editar</a>
+    <a href="{% url 'docentes_lista' %}" class="btn btn-sm">← Volver</a>
+{% endblock %}
+
+{% block content %}
+
+<!-- Info del docente -->
+<div class="card">
+    <div class="card-header">👤 {{ docente.nombre_completo }}</div>
+    <div class="card-body">
+        <div class="detail-grid">
+            <div class="detail-item">
+                <span class="detail-label">DNI</span>
+                <span class="detail-value">{{ docente.dni }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Especialidad</span>
+                <span class="detail-value">{{ docente.get_especialidad_display }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Correo institucional</span>
+                <span class="detail-value">{{ docente.correo_institucional|default:"—" }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Teléfono</span>
+                <span class="detail-value">{{ docente.telefono|default:"—" }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Fecha de ingreso</span>
+                <span class="detail-value">{{ docente.fecha_ingreso|default:"—" }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Estado</span>
+                <span class="detail-value">
+                    {% if docente.activo %}
+                        <span class="badge badge-success">Activo</span>
+                    {% else %}
+                        <span class="badge badge-danger">Inactivo</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cursos asignados agrupados por carrera -->
+<div class="card mt-1">
+    <div class="card-header">📚 Cursos Asignados</div>
+    <div class="card-body p-0">
+        {% if cursos %}
+            {% regroup cursos by carrera as cursos_por_carrera %}
+            {% for grupo in cursos_por_carrera %}
+            <div style="padding: 0.75rem 1rem 0.25rem; background: var(--bg-secondary); font-weight: 600; border-bottom: 1px solid var(--border-color);">
+                <i class="ti ti-books"></i> {{ grupo.grouper.nombre }}
+                <span style="font-weight:400; font-size:0.82rem; color:var(--text-muted);">({{ grupo.grouper.codigo }})</span>
+            </div>
+            <table class="tabla">
+                <thead>
+                    <tr>
+                        <th>Ciclo</th>
+                        <th>Código Curso</th>
+                        <th>Nombre del Curso</th>
+                        <th>Créditos</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cc in grupo.list %}
+                    <tr>
+                        <td>
+                            <span class="badge">Ciclo {{ cc.ciclo }}</span>
+                        </td>
+                        <td><code>{{ cc.curso.codigo }}</code></td>
+                        <td>{{ cc.curso.nombre }}</td>
+                        <td>{{ cc.curso.creditos }}</td>
+                        <td>
+                            <a href="{% url 'asignar_docente' cc.pk %}" class="btn btn-sm">Reasignar</a>
+                            <a href="{% url 'carrera_detalle' cc.carrera.codigo %}" class="btn btn-sm btn-blue">Ver Carrera</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endfor %}
+        {% else %}
+            <div class="text-center" style="padding:2rem; color:var(--text-muted);">
+                Este docente no tiene cursos asignados aún.<br>
+                Puedes asignarlos desde el detalle de cada Carrera.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Carreras donde enseña -->
+{% if carreras %}
+<div class="card mt-1">
+    <div class="card-header">🎓 Carreras donde enseña</div>
+    <div class="card-body">
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+            {% for carrera in carreras %}
+            <a href="{% url 'carrera_detalle' carrera.codigo %}" class="btn btn-sm btn-blue">
+                {{ carrera.nombre }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

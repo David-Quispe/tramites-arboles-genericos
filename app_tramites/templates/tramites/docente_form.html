@@ -1,0 +1,68 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}{{ accion }} Docente{% endblock %}
+{% block nav_docentes %}active{% endblock %}
+{% block topbar_icon %}<i class="ti ti-chalkboard"></i>{% endblock %}
+{% block topbar_titulo %}{{ accion }} Docente{% endblock %}
+{% block topbar_acciones %}
+    <a href="{% url 'docentes_lista' %}" class="btn btn-sm">← Volver</a>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:700px; margin:0 auto;">
+    <div class="card-header">
+        {% if docente %}✏️ Editar: {{ docente.nombre_completo }}{% else %}➕ Registrar nuevo docente{% endif %}
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label>DNI *</label>
+                    {{ form.dni }}
+                    {% if form.dni.errors %}<small class="text-danger">{{ form.dni.errors|join:", " }}</small>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label>Especialidad *</label>
+                    {{ form.especialidad }}
+                </div>
+                <div class="form-group">
+                    <label>Nombre *</label>
+                    {{ form.nombre }}
+                </div>
+                <div class="form-group">
+                    <label>Apellido *</label>
+                    {{ form.apellido }}
+                </div>
+                <div class="form-group">
+                    <label>Correo institucional</label>
+                    {{ form.correo_institucional }}
+                    {% if form.correo_institucional.errors %}<small class="text-danger">{{ form.correo_institucional.errors|join:", " }}</small>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    {{ form.telefono }}
+                </div>
+                <div class="form-group">
+                    <label>Fecha de ingreso</label>
+                    {{ form.fecha_ingreso }}
+                </div>
+                <div class="form-group" style="display:flex; align-items:center; gap:.5rem; padding-top:1.6rem;">
+                    {{ form.activo }}
+                    <label style="margin:0;">Docente activo</label>
+                </div>
+            </div>
+
+            <div style="margin-top:1.5rem; display:flex; gap:.75rem;">
+                <button type="submit" class="btn btn-primary">
+                    {% if docente %}Guardar cambios{% else %}Registrar docente{% endif %}
+                </button>
+                {% if docente %}
+                    <a href="{% url 'docente_detalle' docente.dni %}" class="btn btn-sm">Cancelar</a>
+                {% else %}
+                    <a href="{% url 'docentes_lista' %}" class="btn btn-sm">Cancelar</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}Pensiones Vencidas{% endblock %}
+{% block topbar_titulo %}Pensiones Pendientes / Vencidas{% endblock %}
+{% block topbar_acciones %}
+    <a href="{% url 'finanzas_dashboard' %}" class="btn btn-secondary">← Finanzas</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="card mb-2">
+    <div class="card-header">🔍 Filtros</div>
+    <div class="card-body">
+        <form method="get" class="search-form">
+            <input type="text" name="q" value="{{ q }}" placeholder="DNI o nombre..." class="input-search">
+            <select name="carrera" class="filter-select">
+                <option value="">Todas las carreras</option>
+                {% for c in carreras %}
+                <option value="{{ c.id }}" {% if carrera_id == c.id|stringformat:"s" %}selected{% endif %}>{{ c.nombre }}</option>
+                {% endfor %}
+            </select>
+            <select name="estado" class="filter-select">
+                <option value="">Todos los estados</option>
+                <option value="pendiente" {% if estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                <option value="vencido"   {% if estado == 'vencido'   %}selected{% endif %}>Vencido</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <a href="{% url 'pensiones_vencidas' %}" class="btn btn-secondary">Limpiar</a>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        ⚠️ Pensiones Pendientes / Vencidas
+        <span class="badge">Total: S/ {{ total_monto }}</span>
+    </div>
+    <div class="card-body p-0">
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th>Alumno</th><th>Carrera</th><th>Mes / Año</th>
+                    <th>Monto</th><th>Estado</th><th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in pensiones %}
+                <tr>
+                    <td>
+                        <div class="alumno-cell">
+                            <div class="avatar-ini">{{ p.alumno.nombre|first }}{{ p.alumno.apellido|first }}</div>
+                            <div>
+                                <div class="alumno-nombre">{{ p.alumno.nombre_completo }}</div>
+                                <div class="alumno-dni">{{ p.alumno.dni }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-sm">{{ p.alumno.carrera.nombre }}</td>
+                    <td>{{ p.get_mes_display }} {{ p.anio }}</td>
+                    <td><strong>S/ {{ p.monto }}</strong></td>
+                    <td><span class="badge-estado estado-{{ p.estado }}">{{ p.get_estado_display }}</span></td>
+                    <td>
+                        <a href="{% url 'finanzas_alumno' p.alumno.dni %}" class="btn btn-xs btn-blue">Ver Finanzas</a>
+                        <a href="{% url 'pago_nuevo' p.alumno.dni %}?pension={{ p.pk }}" class="btn btn-xs btn-primary">Registrar Pago</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center">Sin pensiones pendientes 🎉</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if pensiones.has_other_pages %}
+    <div class="card-footer">
+        <div class="pagination-nav">
+            {% if pensiones.has_previous %}<a href="?page={{ pensiones.previous_page_number }}&q={{ q }}" class="btn btn-sm btn-secondary">← Anterior</a>{% endif %}
+            <span class="text-sm text-muted">Página {{ pensiones.number }} de {{ pensiones.paginator.num_pages }}</span>
+            {% if pensiones.has_next %}<a href="?page={{ pensiones.next_page_number }}&q={{ q }}" class="btn btn-sm btn-secondary">Siguiente →</a>{% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

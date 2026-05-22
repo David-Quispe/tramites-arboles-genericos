@@ -1,0 +1,38 @@
+{% extends 'tramites/base.html' %}
+{% block titulo %}Comunicados{% endblock %}
+{% block topbar_titulo %}Comunicados{% endblock %}
+{% block topbar_acciones %}
+    <a href="{% url 'comunicado_nuevo' %}" class="btn btn-primary">+ Nuevo Comunicado</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">📢 Comunicados Publicados</div>
+    <div class="card-body p-0">
+        {% for c in comunicados %}
+        <div class="comunicado-item">
+            <div class="comunicado-head">
+                <span class="badge-estado estado-{{ c.tipo }}">{{ c.get_tipo_display }}</span>
+                <span class="text-sm text-muted">→ {{ c.get_destinatario_display }}{% if c.carrera %}: {{ c.carrera.nombre }}{% endif %}</span>
+                <span class="text-sm text-muted" style="margin-left:auto">{{ c.fecha|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="comunicado-titulo">{{ c.titulo }}</div>
+            <div class="comunicado-cuerpo text-sm text-muted">{{ c.cuerpo|truncatechars:200 }}</div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <span style="font-size:40px;display:block">📭</span>
+            <p>No hay comunicados publicados.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.comunicado-item { padding:16px 18px; border-bottom:1px solid var(--border); }
+.comunicado-item:last-child { border-bottom:none; }
+.comunicado-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap; }
+.comunicado-titulo { font-weight:600; font-size:.95rem; margin-bottom:4px; }
+.comunicado-cuerpo { line-height:1.6; }
+</style>
+{% endblock %}
